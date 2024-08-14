@@ -1,6 +1,5 @@
 package hitachi_genai.popDashBoard.model;
 
-//AvailabilityZone
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
