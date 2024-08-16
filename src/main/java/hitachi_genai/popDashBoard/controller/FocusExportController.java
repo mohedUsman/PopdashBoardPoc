@@ -48,7 +48,7 @@ public class FocusExportController {
             List<FocusExport> focusExports = FocusExportrepository.saveAll(records);
 
             logger.info("Number of records saved: " + focusExports.size());
-            return "File uploaded and data saved to MongoDB!";
+            return "File uploaded and data saved!";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to process the file.";

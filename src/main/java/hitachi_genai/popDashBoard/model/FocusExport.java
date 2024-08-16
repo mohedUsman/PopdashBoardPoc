@@ -29,7 +29,7 @@ public class FocusExport {
     @Column(name = "Availability Zone", length = 800)
     private String AvailabilityZone;
 
-    @Column(name = "Billed Cost")
+    @Column(name = "Billed Cost", length = 77)
     @CsvBindByName(column="BilledCost")
     private double billedCost;
 
