@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 
-@RestController
+//@RestController
 public class FocusExportController {
     
     private static final Logger logger = Logger.getLogger(FocusExportController.class.getName());
     
-    @Autowired
+   // @Autowired
     private FocusExportRepository FocusExportrepository;
 
     @PostMapping(value = "/upload-csv", consumes = {"multipart/form-data"})
