@@ -1,0 +1,160 @@
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/costs")
+public class CostAggregationController {
+
+    @Autowired
+    private CostAggregationService costAggregationService;
+
+    @GetMapping("/daily/{subscriptionId}")
+    public ResponseEntity<List<Document>> getDailyCosts(
+            @PathVariable String subscriptionId) {
+        try {
+            List<Document> dailyCosts = costAggregationService.getDailyCosts(subscriptionId);
+
+            if (dailyCosts == null || dailyCosts.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No daily cost data found");
+            }
+
+            return ResponseEntity.ok(dailyCosts);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid subscription ID", e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while fetching daily costs", e);
+        }
+    }
+
+    @GetMapping("/monthly/{subscriptionId}")
+    public ResponseEntity<List<Document>> getMonthlyCosts(
+            @PathVariable String subscriptionId) {
+        try {
+            List<Document> monthlyCosts = costAggregationService.getMonthlyCosts(subscriptionId);
+
+            if (monthlyCosts == null || monthlyCosts.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No monthly cost data found");
+            }
+
+            return ResponseEntity.ok(monthlyCosts);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid subscription ID", e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while fetching monthly costs", e);
+        }
+    }
+}
+
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface CostRepository extends JpaRepository<Cost, Long> {
+
+    @Query("SELECT c.subscriptionId, c.resourceId, c.resourceType, SUM(c.billedCost) AS totalCost " +
+           "FROM Cost c " +
+           "GROUP BY c.subscriptionId, c.resourceId, c.resourceType")
+    List<Object[]> findAggregatedCosts();
+}
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CostService {
+
+    @Autowired
+    private CostRepository costRepository;
+
+    public List<Object[]> getAggregatedCosts() {
+        return costRepository.findAggregatedCosts();
+    }
+}
+
+
+--++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+public interface CostRepository extends JpaRepository<Cost, Long> {
+
+    @Query("SELECT new com.example.dto.AggregatedCostResponse(c.billingAccountId, c.billingAccountName, SUM(c.billedCost)) " +
+           "FROM Cost c " +
+           "WHERE c.chargePeriodStart >= :startDate AND c.chargePeriodEnd <= :endDate " +
+           "GROUP BY c.billingAccountId, c.billingAccountName")
+    List<AggregatedCostResponse> findTotalCostBySubscriptionId(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    // Add similar methods for other groupings
+}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+package com.example.poc_postgres.repository;
+
+import com.example.poc_postgres.model.CostAggregation;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Repository
+public interface CostAggregationRepository extends CrudRepository<CostAggregation, Long> {
+
+    @Query("SELECT new com.example.poc_postgres.model.CostAggregation(" +
+            "SUM(c.billedCost), c.billingAccountId, c.billingAccountName, c.billingCurrency, " +
+            "c.chargePeriodEnd, c.chargePeriodStart, c.consumedQuantity, c.consumedUnit, " +
+            "c.listUnitPrice, c.regionName, c.resourceName, c.resourceType, c.serviceCategory, " +
+            "c.serviceName, c.subscriptionId, c.tags) " +
+            "FROM CostAggregation c " +
+            "WHERE c.chargePeriodStart >= :startDate AND c.chargePeriodEnd <= :endDate " +
+            "GROUP BY c.subscriptionId")
+    List<CostAggregation> findTotalCostBySubscriptionId(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT new com.example.poc_postgres.model.CostAggregation(" +
+            "SUM(c.billedCost), c.billingAccountId, c.billingAccountName, c.billingCurrency, " +
+            "c.chargePeriodEnd, c.chargePeriodStart, c.consumedQuantity, c.consumedUnit, " +
+            "c.listUnitPrice, c.regionName, c.resourceName, c.resourceType, c.serviceCategory, " +
+            "c.serviceName, c.subscriptionId, c.tags) " +
+            "FROM CostAggregation c " +
+            "WHERE c.chargePeriodStart >= :startDate AND c.chargePeriodEnd <= :endDate " +
+            "GROUP BY c.resourceId")
+    List<CostAggregation> findTotalCostByResourceId(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT new com.example.poc_postgres.model.CostAggregation(" +
+            "SUM(c.billedCost), c.billingAccountId, c.billingAccountName, c.billingCurrency, " +
+            "c.chargePeriodEnd, c.chargePeriodStart, c.consumedQuantity, c.consumedUnit, " +
+            "c.listUnitPrice, c.regionName, c.resourceName, c.resourceType, c.serviceCategory, " +
+            "c.serviceName, c.subscriptionId, c.tags) " +
+            "FROM CostAggregation c " +
+            "WHERE c.chargePeriodStart >= :startDate AND c.chargePeriodEnd <= :endDate " +
+            "GROUP BY c.resourceType")
+    List<CostAggregation> findTotalCostByResourceType(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT new com.example.poc_postgres.model.CostAggregation(" +
+            "SUM(c.billedCost), c.billingAccountId, c.billingAccountName, c.billingCurrency, " +
+            "c.chargePeriodEnd, c.chargePeriodStart, c.consumedQuantity, c.consumedUnit, " +
+            "c.listUnitPrice, c.regionName, c.resourceName, c.resourceType, c.serviceCategory, " +
+            "c.serviceName, c.subscriptionId, c.tags) " +
+            "FROM CostAggregation c " +
+            "WHERE c.chargePeriodStart >= :startDate AND c.chargePeriodEnd <= :endDate " +
+            "GROUP BY c.serviceCategory")
+    List<CostAggregation> findTotalCostByServiceCategory(LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT new com.example.poc_postgres.model.CostAggregation(" +
+            "SUM(c.billedCost), c.billingAccountId, c.billingAccountName, c.billingCurrency, " +
+            "c.chargePeriodEnd, c.chargePeriodStart, c.consumedQuantity, c.consumedUnit, " +
+            "c.listUnitPrice, c.regionName, c.resourceName, c.resource

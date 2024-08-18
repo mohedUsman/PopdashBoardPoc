@@ -13,8 +13,8 @@ import java.util.Objects;
 @Repository
 public interface FocusExportRepository extends JpaRepository<FocusExport, Integer> {
 
-    @Query("SELECT c.BillingAccountName,c.BillingCurrency,c.ResourceType,c.billedCost FROM FocusExport c ")
-    List<Objects[]> finddCosts();
+    @Query("SELECT c.BillingAccountName,c.BillingCurrency,c.ResourceType,SUM(c.billedCost) AS TotalCost FROM FocusExport c GROUP BY c.ResourceType,c.BillingAccountName,c.BillingCurrency")
+    List<Object[]> finddCosts();
 //GROUP BY c.ResourceType,c.BillingAccountName,c.BillingCurrency
 
     @Query(" SELECT f FROM FocusExport f ")
