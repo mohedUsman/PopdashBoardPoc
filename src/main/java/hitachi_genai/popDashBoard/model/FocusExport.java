@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "focus_export")
+@Table(name = "resource_usage_metrics_data")
 @Entity
 public class FocusExport {
 
@@ -26,170 +26,175 @@ public class FocusExport {
     @Column(name = "Id")
     private Integer id;
 
-    @Column(name = "Availability Zone", length = 800)
+    @Column(name = "AvailabilityZone", length = 32)
     private String AvailabilityZone;
 
-    @Column(name = "Billed Cost", length = 77)
+    @Column(name = "BilledCost")
     @CsvBindByName(column="BilledCost")
     private double billedCost;
 
-    @Column(name = "Billing Account ID", length = 800)
+    @Column(name = "BillingAccountId",  columnDefinition = "text")
     @CsvBindByName(column = "BillingAccountId")
     private String billingAccountId;
 
-    @Column(name = "Billing Account Name", length = 800)
+    @Column(name = "BillingAccountName", length = 32)
     @CsvBindByName(column = "BillingAccountName")
     private String BillingAccountName;
 
-    @Column(name = "Billing Currency", length = 800)
+    @Column(name = "BillingCurrency", length = 8)
     @CsvBindByName(column = "BillingCurrency")
     private String BillingCurrency;
 
-    @Column(name = "Billing Period End", length = 800)
+    @Column(name = "BillingPeriodEnd", columnDefinition = "timestamptz")
     @CsvBindByName(column = "BillingPeriodEnd")
     @CsvCustomBindByName(converter = CustomDateConverter.class)
     private Date BillingPeriodEnd;
 
-    @Column(name = "Billing Period Start", length = 800)
+    @Column(name = "BillingPeriodStart", columnDefinition = "timestamptz")
     @CsvBindByName(column = "BillingPeriodStart")
     @CsvCustomBindByName(converter = CustomDateConverter.class)
     private Date BillingPeriodStart;
 
-    @Column(name = "Charge Category", length = 800)
+
+    @Column(name = "ChargeCategory", length = 16)
     @CsvBindByName(column = "ChargeCategory")
     private String ChargeCategory;
 
-    @Column(name = "Charge Class", length = 800)
+    @Column(name = "ChargeClass", columnDefinition = "text")
     @CsvBindByName(column = "ChargeClass")
     private String ChargeClass;
 
-    @Column(name = "Charge Description", length = 800)
+    @Column(name = "ChargeDescription", columnDefinition = "text")
     @CsvBindByName(column = "ChargeDescription")
     private String ChargeDescription;
 
-    @Column(name = "Charge Frequency", length = 800)
+    @Column(name = "ChargeFrequency", columnDefinition = "text")
     @CsvBindByName(column = "ChargeFrequency")
     private String ChargeFrequency;
 
-    @Column(name = "Charge Period End", length = 800)
+    @Column(name = "ChargePeriodEnd", columnDefinition = "timestamptz")
     @CsvBindByName(column = "ChargePeriodEnd")
     @CsvCustomBindByName(converter = CustomDateConverter.class)
     private Date ChargePeriodEnd;
 
-    @Column(name = "Charge Period Start", length = 800)
+    @Column(name = "ChargePeriodStart", columnDefinition = "timestamptz")
     @CsvBindByName(column = "ChargePeriodStart")
     @CsvCustomBindByName(converter = CustomDateConverter.class)
     private Date ChargePeriodStart;
 
-    @Column(name = "Commitment Discount Category", length = 800)
+    @Column(name = "CommitmentDiscountCategory", columnDefinition = "text")
     @CsvBindByName(column = "CommitmentDiscountCategory")
     private String CommitmentDiscountCategory;
 
-    @Column(name = "Commitment Discount ID", length = 800)
+    @Column(name = "CommitmentDiscountId", columnDefinition = "text")
     @CsvBindByName(column = "CommitmentDiscountID")
     private String CommitmentDiscountId;
 
-    @Column(name = "Commitment Discount Name", length = 800)
+    @Column(name = "CommitmentDiscountName", columnDefinition = "text")
     @CsvBindByName(column = "CommitmentDiscountName")
     private String CommitmentDiscountName;
 
-    @Column(name = "Commitment Discount Status", length = 800)
+    @Column(name = "CommitmentDiscountStatus", columnDefinition = "text")
     @CsvBindByName(column = "CommitmentDiscount Status")
     private String CommitmentDiscountStatus;
 
-    @Column(name = "Commitment Discount Type", length = 800)
+    @Column(name = "CommitmentDiscountType", columnDefinition = "text")
     @CsvBindByName(column = "CommitmentDiscountType")
     private String CommitmentDiscountType;
 
-    @Column(name = "Consumed Quantity", length = 800)
+    @Column(name = "ConsumedQuantity")
     @CsvBindByName(column = "ConsumedQuantity")
     private double ConsumedQuantity;
 
-    @Column(name = "Consumed Unit", length = 800)
+    @Column(name = "ConsumedUnit", length = 32)
     @CsvBindByName(column = "ConsumedUnit")
     private String ConsumedUnit;
 
-    @Column(name = "Contracted Cost", length = 800)
+    @Column(name = "ContractedCost")
     @CsvBindByName(column = "ContractedCost")
     private double ContractedCost;
 
-    @Column(name = "Contracted Unit Price", length = 800)
+    @Column(name = "ContractedUnitPrice")
     @CsvBindByName(column = "ContractedUnitPrice")
     private double ContractedUnitPrice;
 
-    @Column(name = "Effective Cost", length = 800)
+    @Column(name = "EffectiveCost")
     @CsvBindByName(column = "EffectiveCost")
     private double EffectiveCost;
 
-    @Column(name = "Invoice Issuer", length = 800)
+    @Column(name = "InvoiceIssuerName", columnDefinition = "text")
     @CsvBindByName(column = "InvoiceIssuer")
     private String InvoiceIssuerName;
 
-    @Column(name = "List Cost", length = 800)
+    @Column(name = "ListCost")
     @CsvBindByName(column = "ListCost")
     private double ListCost;
 
-    @Column(name = "List Unit Price", length = 800)
+    @Column(name = "ListUnitPrice")
     @CsvBindByName(column = "ListUnitPrice")
     private double ListUnitPrice;
 
-    @Column(name = "Pricing Category", length = 800)
+    @Column(name = "PricingCategory", length = 32)
     @CsvBindByName(column = "PricingCategory")
     private String PricingCategory;
 
-    @Column(name = "Pricing Quantity", length = 800)
+    @Column(name = "PricingQuantity")
     @CsvBindByName(column = "PricingQuantity")
     private double PricingQuantity;
 
-    @Column(name = "Pricing Unit", length = 800)
+    @Column(name = "PricingUnit", length = 32)
     @CsvBindByName(column = "PricingUnit")
     private String PricingUnit;
 
-    @Column(name = "Provider", length = 100)
+    @Column(name = "ProviderName", length = 64)
     @CsvBindByName(column = "ProviderName")
     private String ProviderName;
 
-    @Column(name = "Publisher", length = 110)
+    @Column(name = "PublisherName", length = 64)
     @CsvBindByName(column = "PublisherName")
     private String PublisherName;
 
-    @Column(name = "Region ID", length = 800)
+    @Column(name = "RegionId", length = 16)
     @CsvBindByName(column = "RegionId")
     private String RegionId;
 
-    @Column(name = "Region Name", length = 800)
+    @Column(name = "RegionName", length = 16)
     @CsvBindByName(column = "RegionName")
     private String RegionName;
 
-    @Column(name = "Resource ID", length = 800)
+    @Column(name = "ResourceId", columnDefinition = "text")
     @CsvBindByName(column = "ResourceID")
     private String ResourceId;
 
-    @Column(name = "Resource Name", length = 800)
+    @Column(name = "ResourceName", length = 88)
     @CsvBindByName(column = "ResourceName")
     private String ResourceName;
 
-    @Column(name = "Resource Type", length = 800)
+    @Column(name = "ResourceType", length = 48)
     @CsvBindByName(column = "ResourceType")
     private String ResourceType;
 
-    @Column(name = "Service Category", length = 800)
+    @Column(name = "ServiceCategory", length = 32)
     @CsvBindByName(column = "ServiceCategory")
     private String ServiceCategory;
 
-    @Column(name = "Service Name", length = 800)
+    @Column(name = "ServiceName", length = 32)
     @CsvBindByName(column = "ServiceName")
     private String ServiceName;
 
-    @Column(name = "SKU ID", length = 800)
+    @Column(name = "SkuId", length = 40)
     @CsvBindByName(column = "SkuId")
     private String SkuId;
 
-    @Column(name = "Sub Account ID", length = 800)
+    @Column(name = "SkuPriceId", length = 80)
+    @CsvBindByName(column = "SkuPriceId")
+    private String SkuPriceId;
+
+    @Column(name = "SubAccountId", length = 80)
     @CsvBindByName(column = "SubAccountId")
     private String SubAccountId;
 
-    @Column(name = "Sub Account Name", length = 800)
+    @Column(name = "SubAccountName", length = 32)
     @CsvBindByName(column = "SubAccountName")
     private String SubAccountName;
 
