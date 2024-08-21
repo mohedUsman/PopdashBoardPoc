@@ -1,0 +1,6 @@
+package hitachi_genai.popDashBoard.enums;
+
+public enum ServiceCategory {
+
+    AI_AND_MACHINE_LEARNING, COMPUTE, DEVELOPER_TOOLS,MANAGEMENT_AND_GOVERNANCE,  NETWORKING, SECURITY, STORAGE, WEB, OTHER
+}

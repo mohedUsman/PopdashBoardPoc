@@ -2,6 +2,7 @@ package hitachi_genai.popDashBoard.model;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
+import hitachi_genai.popDashBoard.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,9 +42,10 @@ public class FocusExport {
     @CsvBindByName(column = "BillingAccountName")
     private String BillingAccountName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "BillingCurrency", length = 8)
     @CsvBindByName(column = "BillingCurrency")
-    private String BillingCurrency;
+    private BillingCurrency BillingCurrency;
 
     @Column(name = "BillingPeriodEnd", columnDefinition = "timestamptz")
     @CsvBindByName(column = "BillingPeriodEnd")
@@ -55,10 +57,10 @@ public class FocusExport {
     @CsvCustomBindByName(converter = CustomDateConverter.class)
     private Date BillingPeriodStart;
 
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "ChargeCategory", length = 16)
     @CsvBindByName(column = "ChargeCategory")
-    private String ChargeCategory;
+    private ChargeCategory ChargeCategory;
 
     @Column(name = "ChargeClass", columnDefinition = "text")
     @CsvBindByName(column = "ChargeClass")
@@ -68,9 +70,10 @@ public class FocusExport {
     @CsvBindByName(column = "ChargeDescription")
     private String ChargeDescription;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ChargeFrequency", columnDefinition = "text")
     @CsvBindByName(column = "ChargeFrequency")
-    private String ChargeFrequency;
+    private ChargeFrequency ChargeFrequency;
 
     @Column(name = "ChargePeriodEnd", columnDefinition = "timestamptz")
     @CsvBindByName(column = "ChargePeriodEnd")
@@ -106,9 +109,10 @@ public class FocusExport {
     @CsvBindByName(column = "ConsumedQuantity")
     private double ConsumedQuantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ConsumedUnit", length = 32)
     @CsvBindByName(column = "ConsumedUnit")
-    private String ConsumedUnit;
+    private ConsumedUnit ConsumedUnit;
 
     @Column(name = "ContractedCost")
     @CsvBindByName(column = "ContractedCost")
@@ -134,17 +138,19 @@ public class FocusExport {
     @CsvBindByName(column = "ListUnitPrice")
     private double ListUnitPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "PricingCategory", length = 32)
     @CsvBindByName(column = "PricingCategory")
-    private String PricingCategory;
+    private PricingCategory PricingCategory;
 
     @Column(name = "PricingQuantity")
     @CsvBindByName(column = "PricingQuantity")
     private double PricingQuantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "PricingUnit", length = 32)
     @CsvBindByName(column = "PricingUnit")
-    private String PricingUnit;
+    private PricingUnit PricingUnit;
 
     @Column(name = "ProviderName", length = 64)
     @CsvBindByName(column = "ProviderName")
@@ -154,13 +160,15 @@ public class FocusExport {
     @CsvBindByName(column = "PublisherName")
     private String PublisherName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "RegionId", length = 16)
     @CsvBindByName(column = "RegionId")
-    private String RegionId;
+    private RegionId RegionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "RegionName", length = 16)
     @CsvBindByName(column = "RegionName")
-    private String RegionName;
+    private RegionName RegionName;
 
     @Column(name = "ResourceId", columnDefinition = "text")
     @CsvBindByName(column = "ResourceID")
@@ -170,17 +178,20 @@ public class FocusExport {
     @CsvBindByName(column = "ResourceName")
     private String ResourceName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ResourceType", length = 48)
     @CsvBindByName(column = "ResourceType")
-    private String ResourceType;
+    private ResourceType ResourceType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ServiceCategory", length = 32)
     @CsvBindByName(column = "ServiceCategory")
-    private String ServiceCategory;
+    private ServiceCategory ServiceCategory;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ServiceName", length = 32)
     @CsvBindByName(column = "ServiceName")
-    private String ServiceName;
+    private ServiceName ServiceName;
 
     @Column(name = "SkuId", length = 40)
     @CsvBindByName(column = "SkuId")
@@ -194,9 +205,10 @@ public class FocusExport {
     @CsvBindByName(column = "SubAccountId")
     private String SubAccountId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "SubAccountName", length = 32)
     @CsvBindByName(column = "SubAccountName")
-    private String SubAccountName;
+    private SubAccountName SubAccountName;
 
     @Column(name = "Tags", length = 800)
     @CsvBindByName(column = "Tags")
