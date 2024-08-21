@@ -1,4 +1,4 @@
-package hitachi_genai.popDashBoard.model;
+package hitachi_genai.popDashBoard.converters;
 
 import com.opencsv.bean.AbstractBeanField;
 

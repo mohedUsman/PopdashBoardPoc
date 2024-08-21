@@ -2,6 +2,7 @@ package hitachi_genai.popDashBoard.model;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
+import hitachi_genai.popDashBoard.converters.*;
 import hitachi_genai.popDashBoard.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -72,7 +73,7 @@ public class FocusExport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ChargeFrequency", columnDefinition = "text")
-    @CsvBindByName(column = "ChargeFrequency")
+    @CsvCustomBindByName(column = "ChargeFrequency",converter= ChargeFrequencyConverter.class)
     private ChargeFrequency ChargeFrequency;
 
     @Column(name = "ChargePeriodEnd", columnDefinition = "timestamptz")
@@ -111,7 +112,7 @@ public class FocusExport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ConsumedUnit", length = 32)
-    @CsvBindByName(column = "ConsumedUnit")
+    @CsvCustomBindByName(column = "ConsumedUnit",converter = ConsumedUnitConverter.class)
     private ConsumedUnit ConsumedUnit;
 
     @Column(name = "ContractedCost")
@@ -149,7 +150,7 @@ public class FocusExport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PricingUnit", length = 32)
-    @CsvBindByName(column = "PricingUnit")
+    @CsvCustomBindByName(column = "PricingUnit",converter = PricingUnitConverter.class)
     private PricingUnit PricingUnit;
 
     @Column(name = "ProviderName", length = 64)
@@ -167,7 +168,7 @@ public class FocusExport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "RegionName", length = 16)
-    @CsvBindByName(column = "RegionName")
+    @CsvCustomBindByName(column = "RegionName",converter = RegionNameConverter.class)
     private RegionName RegionName;
 
     @Column(name = "ResourceId", columnDefinition = "text")
@@ -180,17 +181,17 @@ public class FocusExport {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ResourceType", length = 48)
-    @CsvBindByName(column = "ResourceType")
+    @CsvCustomBindByName(column = "ResourceType",converter = ResourceTypeConverter.class)
     private ResourceType ResourceType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ServiceCategory", length = 32)
-    @CsvBindByName(column = "ServiceCategory")
+    @CsvCustomBindByName(column = "ServiceCategory",converter = ServiceCategoryConverter.class)
     private ServiceCategory ServiceCategory;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ServiceName", length = 32)
-    @CsvBindByName(column = "ServiceName")
+    @CsvCustomBindByName(column = "ServiceName",converter = ServiceNameConverter.class)
     private ServiceName ServiceName;
 
     @Column(name = "SkuId", length = 40)
