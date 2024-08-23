@@ -1,5 +1,6 @@
 package hitachi_genai.popDashBoard.Repository;
 
+import hitachi_genai.popDashBoard.enums.BillingCurrency;
 import hitachi_genai.popDashBoard.model.FocusExport;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,10 +19,10 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
   //  @Query("SELECT c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.BillingCurrency, c.ChargePeriodEnd, c.ChargePeriodStart, c.ConsumedQuantity, c.ConsumedUnit, c.RegionName, c.ResourceName, c.ResourceType FROM FocusExport c GROUP BY c.ServiceCategory,c.BillingCurrency")
   @Query("SELECT c.ServiceCategory, SUM(c.billedCost) AS TotalCost, " +
           "c.BillingCurrency,  " +
-          "  c.RegionName, c.ResourceType " +
+          "  c.RegionName, c.ResourceType , c.SubAccountId , c.SubAccountName ,c.ChargeDescription " +
           "FROM FocusExport c " +
           "GROUP BY c.ServiceCategory, c.BillingCurrency, " +
-          " c.RegionName, c.ResourceType")
+          " c.RegionName, c.ResourceType,c.SubAccountId , c.SubAccountName,c.ChargeDescription")
   List<Object[]> findTotalCostForServiceCategory();
 
 
@@ -33,4 +34,25 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
   List<Object[]> findTotalCostForServiceCategoryCustomDate(
           @Param("chargePeriodStart") Date chargePeriodStart,
           @Param("chargePeriodEnd") Date chargePeriodEnd);
+
+
+
+
+  /** Working method for API_2  **/
+
+  @Query("SELECT c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName " +
+          "FROM FocusExport c " +
+          "WHERE c.ChargePeriodStart >= :chargePeriodStart AND c.ChargePeriodEnd <= :chargePeriodEnd " +
+          "AND (:currency IS NULL OR c.BillingCurrency = :currency) " +
+          "AND (:cspProvider IS NULL OR c.ProviderName IN :cspProvider) " +
+            "AND (:subAccountId IS NULL OR c.SubAccountId IN :subAccountId) " +
+          "GROUP BY c.ServiceCategory ,c.ProviderName , c.BillingCurrency,c.SubAccountId , c.SubAccountName ")
+  List<Object[]> findAPI_2_ServiceCategory_Cost(
+          @Param("chargePeriodStart") Date chargePeriodStart,
+          @Param("chargePeriodEnd") Date chargePeriodEnd,
+          @Param("currency") BillingCurrency currency,
+          @Param("cspProvider") List<String> cspProvider,
+          @Param("subAccountId") List<String> subAccountId);
+
+
 }

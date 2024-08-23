@@ -51,3 +51,23 @@ CREATE TYPE ResourceType AS ENUM ('API MANAGEMENT SERVICE', 'APP CONFIGURATION',
  'STORAGE ACCOUNTS', 'VIRTUAL MACHINES', 'VIRTUAL MACHINE SCALE SETS', 'VIRTUAL NETWORK');
 
 CREATE TYPE SubAccountName AS ENUM ('SUBLOWERENVS001');
+
+********************************************************************************
+    JSON for  post  API_2_ServiceCategory_Cost
+
+    {
+        "periodicity": "string",
+            "infraCategory": "string",
+            "chargePeriodStart": "2024-07-17T09:02:50.074Z",
+            "chargePeriodEnd": "2024-07-23T09:02:50.074Z",
+            "billingCurrency": "INR",
+            "providerName": [
+        "Microsoft"
+  ],
+        "subAccountId": [
+        "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
+  ]
+    }
+
+*********************************************************************************
+

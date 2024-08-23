@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class CustomDateConverter extends AbstractBeanField<Date, String> {
-    private static final String DATE_FORMAT = "yyyy-MM-dd"; // Adjust the format as needed
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'"; // Adjust the format as needed
 
     @Override
     protected Date convert(String value) {
