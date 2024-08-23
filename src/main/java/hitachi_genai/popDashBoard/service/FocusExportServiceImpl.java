@@ -24,10 +24,6 @@ public class FocusExportServiceImpl implements FocusExportService{
 
     @Autowired
     private FocusExportRepository focusExportRepository;
-//    @Override
-//    public List<Object[]> getDailyCost() {
-//        return focusExportRepository.findCost();
-//    }
 
     @Override
     public List<Object[]> getCostForServiceCategory() {
@@ -50,26 +46,14 @@ public class FocusExportServiceImpl implements FocusExportService{
                 return focusExportRepository.totalCostGroupedByServiceCategoryAndSubAccount();
             }
 
-//    @Override
-//    public List<Object[]> getTotalCostByServiceCategoryAndSubAccount(Date startDate, Date endDate) {
-//        return focusExportRepository.totalCostGroupedByServiceCategoryAndSubAccount(startDate, endDate);
-//    }
 
     public ResourceUsageResponse getResourceUsage(ResourceUsageRequest request) {
+
         List<FocusExport> focusExports = focusExportRepository.findByChargePeriodStartAndChargePeriodEnd(request.getChargePeriodStart(), request.getChargePeriodEnd());
 
         // log the data inside the focusExports
         //logger.info("focusExports data :::::: " + focusExports);
 
-
-
-//        List<Subscription> subscriptions = focusExports.stream()
-//                .collect(Collectors.groupingBy(FocusExport::getSubAccountId))
-//                .entrySet().stream()
-//                .map(entry -> new Subscription(entry.getKey(), entry.getValue()
-//                        .stream().map(focusExport -> focusExport.getSubAccountName().name())
-//                        .findFirst().orElse("")))
-//                .collect(Collectors.toList());
         List<Subscription> subscriptions = focusExports.stream()
                 .collect(Collectors.groupingBy(FocusExport::getSubAccountId))
                 .entrySet().stream()
