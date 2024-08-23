@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -31,9 +33,9 @@ public class FocusExport {
     @Column(name = "AvailabilityZone", length = 32)
     private String AvailabilityZone;
 
-    @Column(name = "BilledCost")
+    @Column(name = "BilledCost", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column="BilledCost")
-    private double billedCost;
+    private BigDecimal billedCost;
 
     @Column(name = "BillingAccountId",  columnDefinition = "text")
     @CsvBindByName(column = "BillingAccountId")
@@ -106,47 +108,47 @@ public class FocusExport {
     @CsvBindByName(column = "CommitmentDiscountType")
     private String CommitmentDiscountType;
 
-    @Column(name = "ConsumedQuantity")
+    @Column(name = "ConsumedQuantity", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "ConsumedQuantity")
-    private double ConsumedQuantity;
+    private BigDecimal ConsumedQuantity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ConsumedUnit", length = 32)
     @CsvCustomBindByName(column = "ConsumedUnit",converter = ConsumedUnitConverter.class)
     private ConsumedUnit ConsumedUnit;
 
-    @Column(name = "ContractedCost")
+    @Column(name = "ContractedCost", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "ContractedCost")
-    private double ContractedCost;
+    private BigDecimal ContractedCost;
 
-    @Column(name = "ContractedUnitPrice")
+    @Column(name = "ContractedUnitPrice", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "ContractedUnitPrice")
-    private double ContractedUnitPrice;
+    private BigDecimal ContractedUnitPrice;
 
-    @Column(name = "EffectiveCost")
+    @Column(name = "EffectiveCost", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "EffectiveCost")
-    private double EffectiveCost;
+    private BigDecimal EffectiveCost;
 
     @Column(name = "InvoiceIssuerName", columnDefinition = "text")
     @CsvBindByName(column = "InvoiceIssuer")
     private String InvoiceIssuerName;
 
-    @Column(name = "ListCost")
+    @Column(name = "ListCost", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "ListCost")
-    private double ListCost;
+    private BigDecimal ListCost;
 
-    @Column(name = "ListUnitPrice")
+    @Column(name = "ListUnitPrice", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "ListUnitPrice")
-    private double ListUnitPrice;
+    private BigDecimal ListUnitPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PricingCategory", length = 32)
     @CsvBindByName(column = "PricingCategory")
     private PricingCategory PricingCategory;
 
-    @Column(name = "PricingQuantity")
+    @Column(name = "PricingQuantity", columnDefinition = "numeric(50, 18)")
     @CsvBindByName(column = "PricingQuantity")
-    private double PricingQuantity;
+    private BigDecimal PricingQuantity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "PricingUnit", length = 32)
@@ -210,6 +212,7 @@ public class FocusExport {
     @Column(name = "SubAccountName", length = 32)
     @CsvBindByName(column = "SubAccountName")
     private SubAccountName SubAccountName;
+
 
     @Column(name = "Tags", length = 800)
     @CsvBindByName(column = "Tags")

@@ -55,5 +55,24 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
           @Param("subAccountId") List<String> subAccountId);
 
 
+
+
+  @Query("SELECT c.ServiceCategory, c.ServiceName, c.SubAccountId, c.SubAccountName, SUM(c.billedCost) " +
+          "FROM FocusExport c " +
+          "GROUP BY c.ServiceCategory, c.ServiceName, c.SubAccountId, c.SubAccountName")
+  List<Object[]> totalCostGroupedByServiceCategoryAndSubAccount();
+
+
+
+  @Query(value = "SELECT * FROM resource_usage_metrics_data WHERE resource_usage_metrics_data.charge_period_start >= :start AND resource_usage_metrics_data.charge_period_end <= :end", nativeQuery = true)
+  List<FocusExport> findByChargePeriodStartAndChargePeriodEnd(@Param("start") Date chargePeriodStart, @Param("end") Date chargePeriodEnd);
+//  @Query("SELECT c.ServiceCategory, c.ServiceName, c.SubAccountId, c.SubAccountName, SUM(c.billedCost) " +
+//          "FROM FocusExport c " +
+//          "WHERE c.ChargePeriodStart >= :StartDate AND c.ChargePeriodEnd <= :EndDate " +
+//          "GROUP BY c.ServiceCategory, c.ServiceName, c.SubAccountId, c.SubAccountName")
+//  List<Object[]> totalCostGroupedByServiceCategoryAndSubAccount(
+//          @Param("startDate") Date startDate,
+//          @Param("endDate") Date endDate);
+
 }
 
