@@ -40,19 +40,24 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
 
   /** Working method for API_2  **/
 
-  @Query("SELECT c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName " +
+  @Query("SELECT " +
+          "CASE WHEN :periodicity = 'daily' THEN DATE_TRUNC('day', c.ChargePeriodStart) " +
+          "     WHEN :periodicity = 'monthly' THEN DATE_TRUNC('month', c.ChargePeriodStart) " +
+          "END AS period, " +
+          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName " +
           "FROM FocusExport c " +
           "WHERE c.ChargePeriodStart >= :chargePeriodStart AND c.ChargePeriodEnd <= :chargePeriodEnd " +
           "AND (:currency IS NULL OR c.BillingCurrency = :currency) " +
           "AND (:cspProvider IS NULL OR c.ProviderName IN :cspProvider) " +
             "AND (:subAccountId IS NULL OR c.SubAccountId IN :subAccountId) " +
-          "GROUP BY c.ServiceCategory ,c.ProviderName , c.BillingCurrency,c.SubAccountId , c.SubAccountName ")
+          "GROUP BY period,c.ServiceCategory ,c.ProviderName , c.BillingCurrency,c.SubAccountId , c.SubAccountName ")
   List<Object[]> findAPI_2_ServiceCategory_Cost(
           @Param("chargePeriodStart") Date chargePeriodStart,
           @Param("chargePeriodEnd") Date chargePeriodEnd,
           @Param("currency") BillingCurrency currency,
           @Param("cspProvider") List<String> cspProvider,
-          @Param("subAccountId") List<String> subAccountId);
+          @Param("subAccountId") List<String> subAccountId,
+          @Param("periodicity") String periodicity);
 
 
 
