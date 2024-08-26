@@ -1,6 +1,9 @@
 package hitachi_genai.popDashBoard.controller;
 
+import hitachi_genai.popDashBoard.dto.ServiceCategoryCost;
 import hitachi_genai.popDashBoard.dto.ServiceCategoryCostRequest;
+import hitachi_genai.popDashBoard.enums.BillingCurrency;
+import hitachi_genai.popDashBoard.enums.SubAccountName;
 import hitachi_genai.popDashBoard.service.FocusExportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,9 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/costs")
@@ -78,9 +83,22 @@ public class FocusExportAggregationController {
 
   **/
     @PostMapping("/getAPI_2_ServiceCategory_Cost")
-    public ResponseEntity<List<Object[]>> getTotalAPI_2_ServiceCategory_Cost(
+    public ResponseEntity<List<ServiceCategoryCost>> getTotalAPI_2_ServiceCategory_Cost(
             @RequestBody ServiceCategoryCostRequest request) {
-        List<Object[]> response = focusExportService.getAPI_2_ServiceCategory_Cost(request);
+        List<Object[]> results = focusExportService.getAPI_2_ServiceCategory_Cost(request);
+        List<ServiceCategoryCost> response = results.stream().map(result ->{
+            ServiceCategoryCost cost = new ServiceCategoryCost();
+            cost.setPeriod((Date) result[0]);
+            cost.setServiceCategory(result[1].toString());
+            cost.setTotalCost((BigDecimal) result[2]);
+            cost.setProviderName((String) result[3]);
+            cost.setBillingCurrency(String.valueOf((BillingCurrency) result[4]));
+            cost.setSubAccountId((String) result[5]);
+            cost.setSubAccountName(String.valueOf((SubAccountName) result[6]));
+            return cost;
+        }).collect(Collectors.toList());
+
+
         return ResponseEntity.ok(response);
     }
 

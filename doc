@@ -71,3 +71,12 @@ CREATE TYPE SubAccountName AS ENUM ('SUBLOWERENVS001');
 
 *********************************************************************************
 
+ [
+    "2024-07-19T18:30:00.000+00:00",
+    "OTHER",
+    20013.4408,
+    "Microsoft",
+    "INR",
+    "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9",
+    "SUBLOWERENVS001"
+  ],
