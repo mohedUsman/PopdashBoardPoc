@@ -13,7 +13,7 @@ public interface FocusExportService {
 
     public List<Object[]> getCostForServiceCategory();
 
-    public List<Object[]> getCostForServiceCategory(Date chargePeriodStart, Date chargePeriodEnd);
+    public List<Object[]> getAPI_3_ServiceCategory_BreakDown_Cost(ServiceCategoryCostRequest request);
 
     List<Object[]> getAPI_2_ServiceCategory_Cost(ServiceCategoryCostRequest request);
     List<Object[]> totalCostByServiceCategoryAndSubAccount();

@@ -27,6 +27,7 @@ public class ServiceCategoryCost {
     private String subAccountId;
     private String subAccountName;
     private Date period;
+    private BigDecimal overallTotalCost;
 //    private Date ChargePeriodStart;
 //    private Date ChargePeriodEnd;
 

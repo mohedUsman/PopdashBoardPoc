@@ -35,8 +35,8 @@ public class FocusExportServiceImpl implements FocusExportService{
     }
 
     @Override
-    public List<Object[]> getCostForServiceCategory(Date chargePeriodStart, Date chargePeriodEnd) {
-        return focusExportRepository.findTotalCostForServiceCategoryCustomDate(chargePeriodStart,chargePeriodEnd);
+    public List<Object[]> getAPI_3_ServiceCategory_BreakDown_Cost(ServiceCategoryCostRequest request) {
+        return focusExportRepository.findAPI_3_ServiceCategory_BreakDown_Cost(request.getChargePeriodStart(),request.getChargePeriodEnd(),request.getBillingCurrency(),request.getProviderName(),request.getSubAccountId(),request.getPeriodicity());
     }
 
     @Override

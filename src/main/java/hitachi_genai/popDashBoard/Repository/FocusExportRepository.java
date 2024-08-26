@@ -26,14 +26,25 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
   List<Object[]> findTotalCostForServiceCategory();
 
 
-  @Query("SELECT c.ServiceCategory, SUM(c.billedCost) AS TotalCost, " +
-          "c.BillingCurrency, c.RegionName, c.ResourceType " +
+  @Query("SELECT " +
+          "CASE WHEN :periodicity = 'daily' THEN DATE_TRUNC('day', c.ChargePeriodStart) " +
+          "     WHEN :periodicity = 'monthly' THEN DATE_TRUNC('month', c.ChargePeriodStart) " +
+          "END AS period, " +
+          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency , c.RegionName, c.ResourceType , c.ChargeDescription ,c.SubAccountId , c.SubAccountName, " +
+          "(SELECT SUM(c2.billedCost) FROM FocusExport c2 WHERE c2.ServiceCategory = c.ServiceCategory) AS OverallTotalCost " +
           "FROM FocusExport c " +
           "WHERE c.ChargePeriodStart >= :chargePeriodStart AND c.ChargePeriodEnd <= :chargePeriodEnd " +
-          "GROUP BY c.ServiceCategory, c.BillingCurrency, c.RegionName, c.ResourceType")
-  List<Object[]> findTotalCostForServiceCategoryCustomDate(
+          "AND (:currency IS NULL OR c.BillingCurrency = :currency) " +
+          "AND (:cspProvider IS NULL OR c.ProviderName IN :cspProvider) " +
+          "AND (:subAccountId IS NULL OR c.SubAccountId IN :subAccountId) " +
+          "GROUP BY period,c.ServiceCategory ,c.ProviderName , c.BillingCurrency, c.RegionName, c.ResourceType , c.ChargeDescription, c.SubAccountId , c.SubAccountName ")
+  List<Object[]> findAPI_3_ServiceCategory_BreakDown_Cost(
           @Param("chargePeriodStart") Date chargePeriodStart,
-          @Param("chargePeriodEnd") Date chargePeriodEnd);
+          @Param("chargePeriodEnd") Date chargePeriodEnd,
+          @Param("currency") BillingCurrency currency,
+          @Param("cspProvider") List<String> cspProvider,
+          @Param("subAccountId") List<String> subAccountId,
+          @Param("periodicity") String periodicity);
 
 
 
@@ -44,7 +55,8 @@ public interface FocusExportRepository extends JpaRepository<FocusExport, Intege
           "CASE WHEN :periodicity = 'daily' THEN DATE_TRUNC('day', c.ChargePeriodStart) " +
           "     WHEN :periodicity = 'monthly' THEN DATE_TRUNC('month', c.ChargePeriodStart) " +
           "END AS period, " +
-          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName " +
+          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName, " +
+          "(SELECT SUM(c2.billedCost) FROM FocusExport c2 WHERE c2.ServiceCategory = c.ServiceCategory) AS OverallTotalCost " +
           "FROM FocusExport c " +
           "WHERE c.ChargePeriodStart >= :chargePeriodStart AND c.ChargePeriodEnd <= :chargePeriodEnd " +
           "AND (:currency IS NULL OR c.BillingCurrency = :currency) " +
