@@ -80,3 +80,19 @@ CREATE TYPE SubAccountName AS ENUM ('SUBLOWERENVS001');
     "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9",
     "SUBLOWERENVS001"
   ],
+
+  ********************************************************************************
+  Post Json For API_1
+
+  {
+    "periodicity": "daily",
+
+    "providerName": [
+      "Microsoft"
+    ],
+    "billingCurrency": "INR",
+    "subAccountName": "SUBLOWERENVS001",
+    "chargePeriodStart": "2024-07-01T10:11:22.445Z",
+    "chargePeriodEnd": "2024-08-01T10:11:22.445Z"
+  }
+  
