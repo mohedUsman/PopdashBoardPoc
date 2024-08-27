@@ -16,6 +16,8 @@ public class ResourceUsageRequest {
     private Date ChargePeriodStart;
     private Date ChargePeriodEnd;
     private String periodicity;
-    private List<String> subscriptions;
+    private List<String> cspProvider;
     private String currency;
+    private List<String> subscriptions;
+
 }

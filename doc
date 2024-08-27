@@ -128,4 +128,20 @@ Postgress for API 2 ServiceCategory Cost
      GROUP BY period, c.service_category, c.provider_name, c.billing_currency,
  	 c.sub_account_id, c.sub_account_name;
 
-*****************************************************************************************************8
+*****************************************************************************************************
+
+  ********************************************************************************
+  Post Json For API_1
+
+  {
+    "periodicity": "daily",
+
+    "providerName": [
+      "Microsoft"
+    ],
+    "billingCurrency": "INR",
+    "subAccountName": "SUBLOWERENVS001",
+    "chargePeriodStart": "2024-07-01T10:11:22.445Z",
+    "chargePeriodEnd": "2024-08-01T10:11:22.445Z"
+  }
+  
