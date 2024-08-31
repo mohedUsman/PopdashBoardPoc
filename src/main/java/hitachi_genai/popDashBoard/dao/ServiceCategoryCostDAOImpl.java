@@ -12,7 +12,9 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
@@ -101,117 +103,67 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
         }, this::mapRowToServiceCategoryBreakdownCostResponse);
     }
 
+
+
     @Override
     public List<CostResponse> getCosts(CostRequest request) {
         String sql = "SELECT " +
                 "CASE " +
                 "WHEN ? = 'daily' THEN DATE_TRUNC('day', c.charge_period_start) " +
-                "WHEN ? = 'monthly' THEN DATE_TRUNC('month', c.charge_period_end) " +
-                "END AS periodicity, " +
+                "WHEN ? = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start) " +
+                "END AS period, " +  // Alias the result as 'period'
                 "SUM(c.billed_cost) AS incurredCost, " +
                 "c.sub_account_name, " +
-                "c.sub_account_id, " +
-                "(SELECT SUM(c2.billed_cost) FROM resource_usage_metrics_data c2 WHERE c2.sub_account_name = c.sub_account_name) AS totalIncurredCost " +
+                "c.sub_account_id " +
                 "FROM resource_usage_metrics_data c " +
                 "WHERE c.charge_period_start >= ? AND c.charge_period_end <= ? " +
-                "GROUP BY rollup(c.sub_account_name, c.sub_account_id, periodicity) " +
-                "ORDER BY c.sub_account_name, c.sub_account_id, periodicity";
+                "GROUP BY (c.sub_account_name, c.sub_account_id, period) " +
+                "ORDER BY c.sub_account_name, c.sub_account_id, period";
 
-        return jdbcTemplate.query(sql, ps -> {
-            ps.setString(1, request.getPeriodicity());
-            ps.setString(2, request.getPeriodicity());
+        String periodicity = request.getPeriodicity();  // Capture periodicity value
+
+        // Map to accumulate costs per subscription
+        Map<String, CostResponse> costResponseMap = new HashMap<>();
+
+        jdbcTemplate.query(sql, ps -> {
+            ps.setString(1, periodicity);
+            ps.setString(2, periodicity);
             ps.setDate(3, new java.sql.Date(request.getChargePeriodStart().getTime()));
             ps.setDate(4, new java.sql.Date(request.getChargePeriodEnd().getTime()));
-        }, this::mapRowToCostResponse);
+        }, rs -> {
+            String subscriptionId = rs.getString("sub_account_id");
+            String subscriptionName = rs.getString("sub_account_name");
 
+            CostResponse costResponse = costResponseMap.computeIfAbsent(subscriptionId, k -> {
+                CostResponse response = new CostResponse();
+                response.setMessage("Success");
+                response.setData(new Data());
+                response.getData().setSubscriptions(new ArrayList<>());
+                response.getData().getSubscriptions().add(new Subscription(subscriptionId, subscriptionName));
+                response.getData().setMonthlyIncurredCost(new ArrayList<>());
+                response.getData().setDailyIncurredCost(new ArrayList<>());
+                return response;
+            });
+
+            Data data = costResponse.getData();
+
+            if ("monthly".equalsIgnoreCase(periodicity)) {
+                MonthlyIncurredCost incurredCost = new MonthlyIncurredCost();
+                incurredCost.setMonth(rs.getString("period"));
+                incurredCost.setIncurredCost(rs.getDouble("incurredCost"));
+                data.getMonthlyIncurredCost().add(incurredCost);
+            } else {
+                DailyIncurredCost incurredCost = new DailyIncurredCost();
+                incurredCost.setDate(rs.getString("period"));
+                incurredCost.setIncurredCost(rs.getDouble("incurredCost"));
+                data.getDailyIncurredCost().add(incurredCost);
+            }
+
+            data.setTotalIncurredCost(data.getTotalIncurredCost() + rs.getDouble("incurredCost"));
+        });
+
+        return new ArrayList<>(costResponseMap.values());
     }
-
-    private CostResponse mapRowToCostResponse(ResultSet rs, int rowNum) throws SQLException {
-        CostResponse response = new CostResponse();
-        Data data = new Data();
-
-        List<Subscription> subscriptions = new ArrayList<>();
-        Subscription subscription = new Subscription();
-        subscription.setSubscriptionId(rs.getString("sub_account_id"));
-        subscription.setSubscriptionName(rs.getString("sub_account_name"));
-        subscriptions.add(subscription);
-        data.setSubscriptions(subscriptions);
-
-        data.setTotalIncurredCost(rs.getDouble("totalIncurredCost"));
-
-        List<IncurredCost> incurredCosts = new ArrayList<>();
-        IncurredCost incurredCost = new IncurredCost();
-        incurredCost.setPeriod(rs.getString("periodicity"));
-        incurredCost.setIncurredCost(rs.getDouble("incurredCost"));
-        incurredCosts.add(incurredCost);
-
-        if ("monthly".equalsIgnoreCase(rs.getString("periodicity"))) {
-            data.setMonthlyIncurredCost(incurredCosts);
-        } else {
-            data.setDailyIncurredCost(incurredCosts);
-        }
-
-        response.setData(data);
-        response.setMessage("Success");
-        response.setErrors(new ArrayList<>()); // Assuming no errors for now
-
-        return response;
-    }
-
-////    public CostResponse getCosts(CostRequest request) {
-////        String sql = "SELECT " +
-////                "CASE " +
-////                "WHEN ? = 'daily' THEN DATE_TRUNC('day', c.charge_period_start) " +
-////                "WHEN ? = 'monthly' THEN DATE_TRUNC('month', c.charge_period_end) " +
-////                "END AS periodicity, " +
-////                "SUM(c.billed_cost) AS incurredCost, " +
-////                "c.sub_account_name, " +
-////                "c.sub_account_id, " +
-////                "(SELECT SUM(c2.billed_cost) FROM resource_usage_metrics_data c2 WHERE c2.sub_account_name = c.sub_account_name) AS totalIncurredCost " +
-////                "FROM resource_usage_metrics_data c " +
-////                "WHERE c.charge_period_start >= ? AND c.charge_period_end <= ? " +
-////                "GROUP BY rollup(c.sub_account_name, c.sub_account_id, periodicity) " +
-////                "ORDER BY c.sub_account_name, c.sub_account_id, periodicity";
-////
-////        return jdbcTemplate.query(sql, ps -> {
-////            ps.setString(1, request.getPeriodicity());
-////            ps.setString(2, request.getPeriodicity());
-////            ps.setDate(3, new java.sql.Date(request.getChargePeriodStart().getTime()));
-////            ps.setDate(4, new java.sql.Date(request.getChargePeriodEnd().getTime()));
-////        }, this::mapRowToCostResponse);
-////    }
-//
-//    private CostResponse mapRowToCostResponse(ResultSet rs, int rowNum) throws SQLException {
-//        CostResponse response = new CostResponse();
-//        Data data = new Data();
-//
-//        List<Subscription> subscriptions = new ArrayList<>();
-//        Subscription subscription = new Subscription();
-//        subscription.setSubscriptionId(rs.getString("sub_account_id"));
-//        subscription.setSubscriptionName(rs.getString("sub_account_name"));
-//        subscriptions.add(subscription);
-//        data.setSubscriptions(subscriptions);
-//
-//        data.setTotalIncurredCost(rs.getDouble("totalIncurredCost"));
-//
-//        List<IncurredCost> incurredCosts = new ArrayList<>();
-//        IncurredCost incurredCost = new IncurredCost();
-//        incurredCost.setPeriod(rs.getString("periodicity"));
-//        incurredCost.setIncurredCost(rs.getDouble("incurredCost"));
-//        incurredCosts.add(incurredCost);
-//
-//        if ("monthly".equalsIgnoreCase(rs.getString("periodicity"))) {
-//            data.setMonthlyIncurredCost(incurredCosts);
-//        } else {
-//            data.setDailyIncurredCost(incurredCosts);
-//        }
-//
-//        response.setData(data);
-//        response.setMessage("Success");
-//        response.setErrors(new ArrayList<>()); // Assuming no errors for now
-//
-//        return response;
-//    }
 
     private ServiceCategoryCostResponse mapRowToServiceCategoryCostResponse(ResultSet rs, int rowNum) throws SQLException {
         return new ServiceCategoryCostResponse(

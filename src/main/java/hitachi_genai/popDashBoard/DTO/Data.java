@@ -14,6 +14,6 @@ import java.util.List;
 public class Data {
     private List<Subscription> subscriptions;
     private double totalIncurredCost;
-    private List<IncurredCost> monthlyIncurredCost;
-    private List<IncurredCost> dailyIncurredCost;
+    private List<MonthlyIncurredCost> monthlyIncurredCost;
+    private List<DailyIncurredCost> dailyIncurredCost;
 }
