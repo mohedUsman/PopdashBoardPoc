@@ -10,14 +10,13 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class ResourceUsageRequest {
-    private Date ChargePeriodStart;
-    private Date ChargePeriodEnd;
+@NoArgsConstructor
+public class CostRequest {
+    private Date chargePeriodStart;
+    private Date chargePeriodEnd;
     private String periodicity;
+    private List<String> subscriptions;
     private List<String> cspProvider;
     private String currency;
-    private List<String> subscriptions;
-
 }

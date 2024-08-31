@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Subscription {
-    private String subscriptionId;
-    private String subscriptionName;
+public class DailyIncurredCost {
+    private String date;
+    private double incurredCost;
 }

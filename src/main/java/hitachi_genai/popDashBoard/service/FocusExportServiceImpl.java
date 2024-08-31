@@ -1,6 +1,6 @@
 package hitachi_genai.popDashBoard.service;
 
-import hitachi_genai.popDashBoard.DTO.*;
+
 import hitachi_genai.popDashBoard.Repository.FocusExportRepository;
 import hitachi_genai.popDashBoard.dto.ServiceCategoryCostRequest;
 import hitachi_genai.popDashBoard.model.FocusExport;
@@ -37,10 +37,10 @@ public class FocusExportServiceImpl implements FocusExportService{
         return focusExportRepository.findAPI_3_ServiceCategory_BreakDown_Cost(request.getChargePeriodStart(),request.getChargePeriodEnd(),request.getBillingCurrency(),request.getProviderName(),request.getSubAccountId(),request.getPeriodicity());
     }
 
-    @Override
-    public List<Object[]> findAPI_1_ServiceNameCost(ServiceOverAllCostRequest request) {
-        return focusExportRepository.findAPI_1_ServiceNameCost(request.getChargePeriodStart(),request.getChargePeriodEnd(),request.getBillingCurrency(),request.getProviderName(),request.getSubAccountName(),request.getPeriodicity());
-    }
+//    @Override
+//    public List<Object[]> findAPI_1_ServiceNameCost(ServiceOverAllCostRequest request) {
+//        return focusExportRepository.findAPI_1_ServiceNameCost(request.getChargePeriodStart(),request.getChargePeriodEnd(),request.getBillingCurrency(),request.getProviderName(),request.getSubAccountName(),request.getPeriodicity());
+//    }
 
     @Override
     public List<Object[]> getAPI_2_ServiceCategory_Cost(ServiceCategoryCostRequest request) {

@@ -1,6 +1,8 @@
 package hitachi_genai.popDashBoard.service;
 
 
+import hitachi_genai.popDashBoard.DTO.CostRequest;
+import hitachi_genai.popDashBoard.DTO.CostResponse;
 import hitachi_genai.popDashBoard.dao.ServiceCategoryCostDAO;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryBreakdownCostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostRequests;
@@ -23,4 +25,12 @@ public class jdbcTemplateCostService {
     public List<ServiceCategoryBreakdownCostResponse> getServiceCategoryBreakdownCosts(ServiceCategoryCostRequests request) {
         return serviceCategoryCostDAO.getServiceCategoryBreakdownCosts(request);
     }
+
+    public List<CostResponse> getCosts(CostRequest request) {
+        return serviceCategoryCostDAO.getCosts(request);
+    }
+
+//    public CostResponse getCosts(CostRequest request) {
+//        return serviceCategoryCostDAO.getCosts(request);
+//    }
 }
