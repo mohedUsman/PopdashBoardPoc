@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Subscription {
-    private String subscriptionId;
-    private String subscriptionName;
+public class CostResponse {
+    private String message;
+    private Data data;
+    private List<Error> errors;
 }

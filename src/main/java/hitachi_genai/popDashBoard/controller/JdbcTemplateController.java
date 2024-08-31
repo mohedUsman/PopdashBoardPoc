@@ -1,5 +1,7 @@
 package hitachi_genai.popDashBoard.controller;
 
+import hitachi_genai.popDashBoard.DTO.CostRequest;
+import hitachi_genai.popDashBoard.DTO.CostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryBreakdownCostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostRequests;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostResponse;
@@ -28,4 +30,15 @@ public class JdbcTemplateController {
     @PostMapping("/service-category-breakdown-costs")
     public List<ServiceCategoryBreakdownCostResponse> getServiceCategoryBreakdownCosts(@RequestBody ServiceCategoryCostRequests request) {
         return service.getServiceCategoryBreakdownCosts(request);
-}}
+    }
+
+    @PostMapping("/costs")
+    public List<CostResponse> getCosts(@RequestBody CostRequest request) {
+        return service.getCosts(request);
+    }
+
+//    @PostMapping("/costs")
+//    public CostResponse getCosts(@RequestBody CostRequest request) {
+//        return service.getCosts(request);
+//    }
+}

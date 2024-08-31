@@ -6,14 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class MonthlyCost {
-    private Date month;
-    private BigDecimal cost;
+@NoArgsConstructor
+public class IncurredCost {
+
+    private String period;
+    private double incurredCost;
 }
