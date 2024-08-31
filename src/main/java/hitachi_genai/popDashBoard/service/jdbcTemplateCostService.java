@@ -30,7 +30,4 @@ public class jdbcTemplateCostService {
         return serviceCategoryCostDAO.getCosts(request);
     }
 
-//    public CostResponse getCosts(CostRequest request) {
-//        return serviceCategoryCostDAO.getCosts(request);
-//    }
 }

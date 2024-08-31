@@ -12,6 +12,5 @@ public interface ServiceCategoryCostDAO {
     List<ServiceCategoryCostResponse> getServiceCategoryCosts(ServiceCategoryCostRequests request);
     List<ServiceCategoryBreakdownCostResponse> getServiceCategoryBreakdownCosts(ServiceCategoryCostRequests request);
     List<CostResponse> getCosts(CostRequest request);
-//    CostResponse getCosts(CostRequest request);
 
 }
