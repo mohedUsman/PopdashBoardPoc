@@ -232,3 +232,24 @@ Postgress for API 2 ServiceCategory Cost
              "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
            ]
          }'
+
+
+************************************************************************************
+For Api one
+curl -X 'POST' \
+  'http://localhost:8080/api/jdbc-template/costs' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "chargePeriodStart": "2024-07-01",
+  "chargePeriodEnd": "2024-08-01",
+  "periodicity": "monthly",
+  "subscriptions": [
+    "SUBLOWERENVS001"
+
+  ],
+  "cspProvider": [
+    "Microsoft"
+  ],
+  "currency": "INR"
+}'

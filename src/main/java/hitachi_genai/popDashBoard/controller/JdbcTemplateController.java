@@ -37,8 +37,4 @@ public class JdbcTemplateController {
         return service.getCosts(request);
     }
 
-//    @PostMapping("/costs")
-//    public CostResponse getCosts(@RequestBody CostRequest request) {
-//        return service.getCosts(request);
-//    }
 }
