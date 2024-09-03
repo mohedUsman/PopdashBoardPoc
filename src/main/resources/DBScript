@@ -1,0 +1,69 @@
+-- Table: public.resource_usage_metrics_data
+
+-- DROP TABLE IF EXISTS public.resource_usage_metrics_data;
+
+CREATE TABLE IF NOT EXISTS public.resource_usage_metrics_data
+(
+    id integer NOT NULL,
+    availability_zone character varying(32) COLLATE pg_catalog."default",
+    billing_account_name character varying(32) COLLATE pg_catalog."default",
+    billing_currency character varying(8) COLLATE pg_catalog."default",
+    billing_period_end timestamp with time zone,
+    billing_period_start timestamp with time zone,
+    charge_category character varying(16) COLLATE pg_catalog."default",
+    charge_class text COLLATE pg_catalog."default",
+    charge_description text COLLATE pg_catalog."default",
+    charge_frequency text COLLATE pg_catalog."default",
+    charge_period_end timestamp with time zone,
+    charge_period_start timestamp with time zone,
+    commitment_discount_category text COLLATE pg_catalog."default",
+    commitment_discount_id text COLLATE pg_catalog."default",
+    commitment_discount_name text COLLATE pg_catalog."default",
+    commitment_discount_status text COLLATE pg_catalog."default",
+    commitment_discount_type text COLLATE pg_catalog."default",
+    consumed_quantity numeric(50,18),
+    consumed_unit character varying(32) COLLATE pg_catalog."default",
+    contracted_cost numeric(50,18),
+    contracted_unit_price numeric(50,18),
+    effective_cost numeric(50,18),
+    invoice_issuer_name text COLLATE pg_catalog."default",
+    list_cost numeric(50,18),
+    list_unit_price numeric(50,18),
+    pricing_category character varying(32) COLLATE pg_catalog."default",
+    pricing_quantity numeric(50,18),
+    pricing_unit character varying(32) COLLATE pg_catalog."default",
+    provider_name character varying(64) COLLATE pg_catalog."default",
+    publisher_name character varying(64) COLLATE pg_catalog."default",
+    region_id character varying(16) COLLATE pg_catalog."default",
+    region_name character varying(16) COLLATE pg_catalog."default",
+    resource_id text COLLATE pg_catalog."default",
+    resource_name character varying(88) COLLATE pg_catalog."default",
+    resource_type character varying(48) COLLATE pg_catalog."default",
+    service_category character varying(32) COLLATE pg_catalog."default",
+    service_name character varying(32) COLLATE pg_catalog."default",
+    sku_id character varying(40) COLLATE pg_catalog."default",
+    sku_price_id character varying(80) COLLATE pg_catalog."default",
+    sub_account_id character varying(80) COLLATE pg_catalog."default",
+    sub_account_name character varying(32) COLLATE pg_catalog."default",
+    tags character varying(800) COLLATE pg_catalog."default",
+    billed_cost numeric(50,18),
+    billing_account_id text COLLATE pg_catalog."default",
+    CONSTRAINT resource_usage_metrics_data_pkey PRIMARY KEY (id),
+    CONSTRAINT resource_usage_metrics_data_billing_currency_check CHECK (billing_currency::text = ANY (ARRAY['USD'::character varying, 'EUR'::character varying, 'GBP'::character varying, 'JPY'::character varying, 'INR'::character varying, 'CAD'::character varying, 'AUD'::character varying, 'SGD'::character varying, 'CHF'::character varying, 'MYR'::character varying, 'NZD'::character varying, 'THB'::character varying, 'HKD'::character varying, 'TWD'::character varying, 'KRW'::character varying, 'CNY'::character varying, 'IDR'::character varying, 'VND'::character varying, 'PHP'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_charge_category_check CHECK (charge_category::text = ANY (ARRAY['USAGE'::character varying, 'SUBSCRIPTION'::character varying, 'OTHER'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_consumed_unit_check CHECK (consumed_unit::text = ANY (ARRAY['UNITS'::character varying, 'UNITS_PER_MONTH'::character varying, 'GB'::character varying, 'GB_PER_MONTH'::character varying, 'GB_SECONDS'::character varying, 'HOURS'::character varying, 'UNITS_PER_HOUR'::character varying, 'UNITS_PER_DAY'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_pricing_category_check CHECK (pricing_category::text = ANY (ARRAY['STANDARD'::character varying, 'DISCOUNTED'::character varying, 'OTHER'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_pricing_unit_check CHECK (pricing_unit::text = ANY (ARRAY['UNITS'::character varying, 'UNITS_PER_DAY'::character varying, 'UNITS_PER_HOUR'::character varying, 'UNITS_PER_MONTH'::character varying, 'GB'::character varying, 'GB_PER_MONTH'::character varying, 'GB_SECONDS'::character varying, 'HOURS'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_region_id_check CHECK (region_id::text = ANY (ARRAY['EASTUS'::character varying, 'EASTUS2'::character varying, 'GLOBAL'::character varying, 'NORTHCENTRALUS'::character varying, 'SOUTHCENTRALUS'::character varying, 'WESTUS'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_charge_frequency_check CHECK (charge_frequency = ANY (ARRAY['USAGE_BASED'::text, 'MONTHLY'::text, 'QUARTERLY'::text, 'YEARLY'::text, 'ONE_TIME'::text, 'OTHER'::text])),
+    CONSTRAINT resource_usage_metrics_data_region_name_check CHECK (region_name::text = ANY (ARRAY['EAST_US'::character varying, 'EAST_US_2'::character varying, 'GLOBAL'::character varying, 'NORTH_CENTRAL_US'::character varying, 'SOUTH_CENTRAL_US'::character varying, 'WEST_US'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_resource_type_check CHECK (resource_type::text = ANY (ARRAY['API_MANAGEMENT_SERVICE'::character varying, 'APP_CONFIGURATION'::character varying, 'APP_SERVICE_WEB_APP'::character varying, 'AZURE_AI_SERVICES'::character varying, 'CONTAINER_REGISTRY'::character varying, 'DISK'::character varying, 'KEY_VAULT'::character varying, 'KUBERNETES_SERVICE'::character varying, 'LOAD_BALANCER'::character varying, 'LOG_ANALYTICS_WORKSPACE'::character varying, 'NETWORK_WATCHER'::character varying, 'PRIVATE_DNS_ZONE'::character varying, 'PRIVATE_ENDPOINT'::character varying, 'PUBLIC_IP_ADDRESS'::character varying, 'SAAS'::character varying, 'SNAPSHOT'::character varying, 'STORAGE_ACCOUNT'::character varying, 'VIRTUAL_MACHINE'::character varying, 'VIRTUAL_MACHINE_SCALE_SET'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_service_category_check CHECK (service_category::text = ANY (ARRAY['AI_AND_MACHINE_LEARNING'::character varying, 'COMPUTE'::character varying, 'DEVELOPER_TOOLS'::character varying, 'MANAGEMENT_AND_GOVERNANCE'::character varying, 'NETWORKING'::character varying, 'SECURITY'::character varying, 'STORAGE'::character varying, 'WEB'::character varying, 'OTHER'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_service_name_check CHECK (service_name::text = ANY (ARRAY['API_MANAGEMENT'::character varying, 'APP_CONFIGURATION'::character varying, 'AZURE_AI_SERVICES'::character varying, 'AZURE_APP_SERVICE'::character varying, 'AZURE_CONTAINER_REGISTRY'::character varying, 'AZURE_KUBERNETES_SERVICE'::character varying, 'AZURE_MARKETPLACE'::character varying, 'AZURE_MONITOR'::character varying, 'AZURE_PRIVATE_LINK'::character varying, 'KEY_VAULT'::character varying, 'LOAD_BALANCER'::character varying, 'NETWORK_WATCHER'::character varying, 'STORAGE_ACCOUNTS'::character varying, 'VIRTUAL_MACHINES'::character varying, 'VIRTUAL_MACHINE_SCALE_SETS'::character varying, 'VIRTUAL_NETWORK'::character varying]::text[])),
+    CONSTRAINT resource_usage_metrics_data_sub_account_name_check CHECK (sub_account_name::text = 'SUBLOWERENVS001'::text)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.resource_usage_metrics_data
+    OWNER to postgres;
