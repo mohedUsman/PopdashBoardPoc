@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,13 +23,14 @@ public class ServiceCategoryCost {
 //          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName "
 
     private String serviceCategory;
-    private BigDecimal totalCost;
-    private String billingCurrency;
-    private String providerName;
-    private String subAccountId;
-    private String subAccountName;
-    private Date period;
-    private BigDecimal overallTotalCost;
+    private BigDecimal serviceCategoryTotalCost;
+    private List<ServicesName> serviceNames;
+//    private String billingCurrency;
+//    private String providerName;
+//    private String subAccountId;
+//    private String subAccountName;
+//    private Date period;
+//    private BigDecimal overallTotalCost;
 //    private Date ChargePeriodStart;
 //    private Date ChargePeriodEnd;
 
