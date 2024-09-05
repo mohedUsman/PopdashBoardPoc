@@ -7,6 +7,7 @@ import hitachi_genai.popDashBoard.dto.CostResponse2;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryBreakdownCostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostRequests;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostResponse;
+import hitachi_genai.popDashBoard.model.FocusExport;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface ServiceCategoryCostDAO {
     List<CostResponse2> getServiceCategoryCosts(ServiceCategoryCostRequests request);
     List<CostResponse1> getServiceCategoryBreakdownCosts(ServiceCategoryCostRequests request);
     List<CostResponse> getCosts(CostRequest request);
-
+    void batchInsert(List<FocusExport> focusExports);
 }

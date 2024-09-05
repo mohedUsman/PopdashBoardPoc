@@ -1,5 +1,6 @@
 package hitachi_genai.popDashBoard.enums;
 
 public enum SubAccountName {
-    SUBLOWERENVS001
+    SUBLOWERENVS001,
+    SUBHigherEnvs001
 }

@@ -5,6 +5,7 @@ import hitachi_genai.popDashBoard.dto.*;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryBreakdownCostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostRequests;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostResponse;
+import hitachi_genai.popDashBoard.model.FocusExport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,15 @@ import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @Repository
 public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
@@ -269,7 +278,11 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 data.getMonthlyIncurredCost().add(incurredCost);
             } else {
                 DailyIncurredCost incurredCost = new DailyIncurredCost();
-                incurredCost.setDate(rs.getString("period"));
+
+                LocalDate date = rs.getDate("period").toLocalDate();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                incurredCost.setDate(date.format(formatter));
+
                 incurredCost.setIncurredCost(rs.getDouble("incurredCost"));
                 data.getDailyIncurredCost().add(incurredCost);
             }
@@ -279,6 +292,8 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
 
         return new ArrayList<>(costResponseMap.values());
     }
+
+
 
     private ServiceCategoryCostResponse mapRowToServiceCategoryCostResponse(ResultSet rs, int rowNum) throws SQLException {
         return new ServiceCategoryCostResponse(
@@ -302,5 +317,68 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 rs.getString("resource_type"),
                 rs.getString("charge_description")
         );
+    }
+
+
+    private static final String INSERT_SQL = "INSERT INTO resource_usage_metrics_data (" +
+            "availability_zone, billed_cost, billing_account_id, billing_account_name, billing_currency, " +
+            "billing_period_end, billing_period_start, charge_category, charge_class, charge_description, " +
+            "charge_frequency, charge_period_end, charge_period_start, commitment_discount_category, " +
+            "commitment_discount_id, commitment_discount_name, commitment_discount_status, commitment_discount_type, " +
+            "consumed_quantity, consumed_unit, contracted_cost, contracted_unit_price, effective_cost, " +
+            "invoice_issuer_name, list_cost, list_unit_price, pricing_category, pricing_quantity, pricing_unit, " +
+            "provider_name, publisher_name, region_id, region_name, resource_id, resource_name, resource_type, " +
+            "service_category, service_name, sku_id, sku_price_id, sub_account_id, sub_account_name, tags) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+
+
+
+    @Override
+    public void batchInsert(List<FocusExport> focusExports) {
+        jdbcTemplate.batchUpdate(INSERT_SQL, focusExports, 1000, (PreparedStatement ps, FocusExport focusExport) -> {
+            ps.setString(1, focusExport.getAvailabilityZone());
+            ps.setBigDecimal(2, focusExport.getBilledCost());
+            ps.setString(3, focusExport.getBillingAccountId());
+            ps.setString(4, focusExport.getBillingAccountName());
+            ps.setString(5, focusExport.getBillingCurrency() != null ? focusExport.getBillingCurrency().name() : null);
+            ps.setTimestamp(6, new java.sql.Timestamp(focusExport.getBillingPeriodEnd().getTime()));
+            ps.setTimestamp(7, new java.sql.Timestamp(focusExport.getBillingPeriodStart().getTime()));
+            ps.setString(8, focusExport.getChargeCategory() != null ? focusExport.getChargeCategory().name() : null);
+            ps.setString(9, focusExport.getChargeClass());
+            ps.setString(10, focusExport.getChargeDescription());
+            ps.setString(11, focusExport.getChargeFrequency() != null ? focusExport.getChargeFrequency().name() : null);
+            ps.setTimestamp(12, new java.sql.Timestamp(focusExport.getChargePeriodEnd().getTime()));
+            ps.setTimestamp(13, new java.sql.Timestamp(focusExport.getChargePeriodStart().getTime()));
+            ps.setString(14, focusExport.getCommitmentDiscountCategory());
+            ps.setString(15, focusExport.getCommitmentDiscountId());
+            ps.setString(16, focusExport.getCommitmentDiscountName());
+            ps.setString(17, focusExport.getCommitmentDiscountStatus());
+            ps.setString(18, focusExport.getCommitmentDiscountType());
+            ps.setBigDecimal(19, focusExport.getConsumedQuantity());
+            ps.setString(20, focusExport.getConsumedUnit() != null ? focusExport.getConsumedUnit().name() : null);
+            ps.setBigDecimal(21, focusExport.getContractedCost());
+            ps.setBigDecimal(22, focusExport.getContractedUnitPrice());
+            ps.setBigDecimal(23, focusExport.getEffectiveCost());
+            ps.setString(24, focusExport.getInvoiceIssuerName());
+            ps.setBigDecimal(25, focusExport.getListCost());
+            ps.setBigDecimal(26, focusExport.getListUnitPrice());
+            ps.setString(27, focusExport.getPricingCategory() != null ? focusExport.getPricingCategory().name() : null);
+            ps.setBigDecimal(28, focusExport.getPricingQuantity());
+            ps.setString(29, focusExport.getPricingUnit() != null ? focusExport.getPricingUnit().name() : null);
+            ps.setString(30, focusExport.getProviderName());
+            ps.setString(31, focusExport.getPublisherName());
+            ps.setString(32, focusExport.getRegionId() != null ? focusExport.getRegionId().name() : null);
+            ps.setString(33, focusExport.getRegionName() != null ? focusExport.getRegionName().name() : null);
+            ps.setString(34, focusExport.getResourceId());
+            ps.setString(35, focusExport.getResourceName());
+            ps.setString(36, focusExport.getResourceType() != null ? focusExport.getResourceType().name() : null);
+            ps.setString(37, focusExport.getServiceCategory() != null ? focusExport.getServiceCategory().name() : null);
+            ps.setString(38, focusExport.getServiceName() != null ? focusExport.getServiceName().name() : null);
+            ps.setString(39, focusExport.getSkuId());
+            ps.setString(40, focusExport.getSkuPriceId());
+            ps.setString(41, focusExport.getSubAccountId());
+            ps.setString(42, focusExport.getSubAccountName() != null ? focusExport.getSubAccountName().name() : null);
+            ps.setString(43, focusExport.getTags());
+        });
     }
 }
