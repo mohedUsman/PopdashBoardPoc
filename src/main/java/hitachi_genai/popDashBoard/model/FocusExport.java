@@ -26,8 +26,8 @@ public class FocusExport {
     private static final Logger logger = Logger.getLogger(FocusExport.class.getName());
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Id", nullable = false, updatable = false)
     private Integer id;
 
     @Column(name = "AvailabilityZone", length = 32)
