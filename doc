@@ -52,86 +52,120 @@ CREATE TYPE ResourceType AS ENUM ('API MANAGEMENT SERVICE', 'APP CONFIGURATION',
 
 CREATE TYPE SubAccountName AS ENUM ('SUBLOWERENVS001');
 
-********************************************************************************
-    JSON for  post  API_2_ServiceCategory_Cost
+*********************************************************************************
 
-    {
-        "periodicity": "string",
-            "infraCategory": "string",
-            "chargePeriodStart": "2024-07-17T09:02:50.074Z",
-            "chargePeriodEnd": "2024-07-23T09:02:50.074Z",
-            "billingCurrency": "INR",
-            "providerName": [
-        "Microsoft"
-  ],
-        "subAccountId": [
-        "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
-  ]
-    }
+ =======================INPUTS FOR APIS AND DB QUERIES===========================
 
 *********************************************************************************
 
-Postgress for API 3 ServiceCategory Cost
+Postgress DB QUERY for API 3 ServiceCategory Cost
 ************************************************************************************
- SELECT
-         CASE
-             WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
-             WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
-         END AS period,
-         c.service_category,
-         SUM(c.billed_cost) AS total_cost,
-         c.provider_name,
-         c.billing_currency,
-         c.region_name,
-         c.resource_type,
-         c.charge_description,
-         c.sub_account_id,
-         c.sub_account_name,
-         (SELECT SUM(c2.billed_cost)
-          FROM resource_usage_metrics_data c2
-          WHERE c2.service_category = c.service_category) AS overall_total_cost
-     FROM resource_usage_metrics_data c
-     WHERE c.charge_period_start >= '2024-07-01T00:00Z'
-       AND c.charge_period_end <= '2024-08-01T00:00Z'
-       AND ('INR' IS NULL OR c.billing_currency = 'INR')
-       AND (ARRAY['Microsoft'] IS NULL OR c.provider_name = ANY(ARRAY['Microsoft']))
-       AND (ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9'] IS NULL
- 	  OR c.sub_account_id = ANY(ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']))
-     GROUP BY period, c.service_category, c.provider_name, c.billing_currency,
- 	c.region_name, c.resource_type, c.charge_description, c.sub_account_id, c.sub_account_name;
+
+SELECT			c.service_category,
+				c.service_name,
+				c.charge_description,
+                CASE
+                WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
+               WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
+                END AS period,
+
+                SUM(c.billed_cost*0.012) AS total_cost
+                FROM resource_usage_metrics_data c
+                WHERE c.charge_period_start >= '2024-07-01T00:00Z'
+                AND c.charge_period_end <= '2024-08-01T00:00Z'
+                AND ('INR' IS NULL OR c.billing_currency = 'INR')
+                AND ('Microsoft' IS NULL OR c.provider_name = 'Microsoft')
+                AND ('/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9'
+				IS NULL OR c.sub_account_id = '/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9')
+                GROUP BY ( c.service_category ,c.service_name,
+			 c.charge_description, period)
+                ORDER BY total_cost desc , c.service_category,c.service_name
+				,c.charge_description ;
+
+**************************************************************************************************
+
+Json for API 3 ServiceCategory Breakdown Cost
+
+************************************************************************************************8
+
+{
+           "periodicity": "monthly",
+
+           "chargePeriodStart": "2024-07-01T11:57:49.237Z",
+           "chargePeriodEnd": "2024-08-01T11:57:49.237Z",
+           "billingCurrency": "INR",
+           "providerName": [
+             "Microsoft"
+           ],
+           "subAccountId": [
+             "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
+           ]
+         }
 
 *****************************************************************************************************
 
-Postgress for API 2 ServiceCategory Cost
+Postgress DB QUERY for API 2 ServiceCategory Cost
 ************************************************************************************
- SELECT
-         CASE
-             WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
-             WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
-         END AS period,
-         c.service_category,
-         SUM(c.billed_cost) AS total_cost,
-         c.provider_name,
-         c.billing_currency,
-         c.sub_account_id,
-         c.sub_account_name,
-         (SELECT SUM(c2.billed_cost)
-          FROM resource_usage_metrics_data c2
-          WHERE c2.service_category = c.service_category) AS overall_total_cost
-     FROM resource_usage_metrics_data c
-     WHERE c.charge_period_start >= '2024-07-01T00:00Z'
-       AND c.charge_period_end <= '2024-08-01T00:00Z'
-       AND ('INR' IS NULL OR c.billing_currency = 'INR')
-       AND (ARRAY['Microsoft'] IS NULL OR c.provider_name = ANY(ARRAY['Microsoft']))
-       AND (ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9'] IS NULL
- 	  OR c.sub_account_id = ANY(ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']))
-     GROUP BY period, c.service_category, c.provider_name, c.billing_currency,
- 	 c.sub_account_id, c.sub_account_name;
+ SELECT           CASE
+                 WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
+                 WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
+                 END AS period,
+                 c.service_category,
+
+                 SUM(c.billed_cost)/83.7 AS total_cost
+                 FROM resource_usage_metrics_data c
+                 WHERE c.charge_period_start >= '2024-07-01T00:00Z'
+                 AND c.charge_period_end <= '2024-08-01T00:00Z'
+                 AND ('INR' IS NULL OR c.billing_currency = 'INR')
+                 AND (ARRAY['Microsoft'] IS NULL OR c.provider_name = ANY(ARRAY['Microsoft']))
+                 AND (ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']
+ 				IS NULL OR c.sub_account_id = ANY(ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']))
+                 GROUP BY (  c.service_category, period)
+                 ORDER BY  period,total_cost desc ,c.service_category;
 
 *****************************************************************************************************
+
+Json for API 2 ServiceCategory Cost
+
+************************************************************************************************8
+
+{
+           "periodicity": "monthly",
+
+           "chargePeriodStart": "2024-07-01T11:57:49.237Z",
+           "chargePeriodEnd": "2024-08-01T11:57:49.237Z",
+           "billingCurrency": "INR",
+           "providerName": [
+             "Microsoft"
+           ],
+           "subAccountId": [
+             "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
+           ]
+         }
 
   ********************************************************************************
-  Post Json For API_1
+
+
+Postgress DB QUERY for API 1 Subscription Cost
+************************************************************************************
+ SELECT
+ CASE
+  WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
+  WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_end)
+  END AS period,
+  SUM(c.billed_cost) AS incurredCost,
+  c.sub_account_name,c.sub_account_id,
+ (SELECT SUM(c2.billed_cost) FROM resource_usage_metrics_data c2 WHERE c2.sub_account_name = c.sub_account_name) AS totalIncurredCost
+ FROM resource_usage_metrics_data c
+ WHERE c.charge_period_start >= '2024-07-01' AND c.charge_period_end <= '2024-08-01'
+ GROUP BY (c.sub_account_name, c.sub_account_id,period)
+ order by c.sub_account_name, c.sub_account_id,period;
+
+*****************************************************************************************************
+
+Json for API 1 Subscription Cost
+
+************************************************************************************************8
 
   {
     "periodicity": "daily",
@@ -144,112 +178,6 @@ Postgress for API 2 ServiceCategory Cost
     "chargePeriodStart": "2024-07-01T10:11:22.445Z",
     "chargePeriodEnd": "2024-08-01T10:11:22.445Z"
   }
+****************************************************************************
+**************************************************************************
 
-    ************************************************************************************
-    -- query for API 1 jdbcTemplate
-    SELECT
-            c.sub_account_id,
-    		c.sub_account_name,
-            CASE
-                WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
-                WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
-            END AS period,
-    		c.service_category,
-    		 SUM(c.billed_cost) AS total_cost
-        FROM resource_usage_metrics_data c
-        WHERE c.charge_period_start >= '2024-07-01T00:00Z'
-          AND c.charge_period_end <= '2024-08-01T00:00Z'
-          AND ('INR' IS NULL OR c.billing_currency = 'INR')
-          AND (ARRAY['Microsoft'] IS NULL OR c.provider_name = ANY(ARRAY['Microsoft']))
-          AND (ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9'] IS NULL
-          OR c.sub_account_id = ANY(ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']))
-
-    	GROUP BY rollup(
-         c.sub_account_id, c.sub_account_name, period, c.service_category)
-    	 order by c.sub_account_id, c.sub_account_name, period, c.service_category;
-
-
-     curl -X 'POST' \
-       'http://localhost:8080/api/jdbc-template/service-category-costs' \
-       -H 'accept: */*' \
-       -H 'Content-Type: application/json' \
-       -d '{
-       "periodicity": "monthly",
-
-       "chargePeriodStart": "2024-07-01T11:57:49.237Z",
-       "chargePeriodEnd": "2024-08-01T11:57:49.237Z",
-       "billingCurrency": "INR",
-       "providerName": [
-         "Microsoft"
-       ],
-       "subAccountId": [
-         "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
-       ]
-     }'
-
-
-     ************************************************************************************
-        -- query for API 2 jdbcTemplate
-     SELECT
-             c.sub_account_id,
-     		c.sub_account_name,
-             CASE
-                 WHEN 'daily' = 'daily' THEN DATE_TRUNC('day', c.charge_period_start)
-                 WHEN 'daily' = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start)
-             END AS period,
-     		c.service_category,
-     		c.billing_currency,
-             c.region_name,
-             c.resource_type,
-             c.charge_description,
-     		 SUM(c.billed_cost) AS total_cost
-         FROM resource_usage_metrics_data c
-         WHERE c.charge_period_start >= '2024-07-01T00:00Z'
-           AND c.charge_period_end <= '2024-08-01T00:00Z'
-           AND ('INR' IS NULL OR c.billing_currency = 'INR')
-           AND (ARRAY['Microsoft'] IS NULL OR c.provider_name = ANY(ARRAY['Microsoft']))
-           AND (ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9'] IS NULL
-           OR c.sub_account_id = ANY(ARRAY['/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9']))
-
-     	GROUP BY rollup(
-          c.sub_account_id, c.sub_account_name, period, c.service_category,c.billing_currency,c.region_name,c.resource_type,c.charge_description)
-     	 order by c.sub_account_id, c.sub_account_name, period, c.service_category,c.billing_currency,c.region_name,c.resource_type,c.charge_description;
-
-     	 curl -X 'POST' \
-           'http://localhost:8080/api/jdbc-template/service-category-breakdown-costs' \
-           -H 'accept: */*' \
-           -H 'Content-Type: application/json' \
-           -d '{
-           "periodicity": "monthly",
-
-           "chargePeriodStart": "2024-07-01T11:57:49.237Z",
-           "chargePeriodEnd": "2024-08-01T11:57:49.237Z",
-           "billingCurrency": "INR",
-           "providerName": [
-             "Microsoft"
-           ],
-           "subAccountId": [
-             "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
-           ]
-         }'
-
-
-************************************************************************************
-For Api one
-curl -X 'POST' \
-  'http://localhost:8080/api/jdbc-template/costs' \
-  -H 'accept: */*' \
-  -H 'Content-Type: application/json' \
-  -d '{
-  "chargePeriodStart": "2024-07-01",
-  "chargePeriodEnd": "2024-08-01",
-  "periodicity": "monthly",
-  "subscriptions": [
-    "SUBLOWERENVS001"
-
-  ],
-  "cspProvider": [
-    "Microsoft"
-  ],
-  "currency": "INR"
-}'

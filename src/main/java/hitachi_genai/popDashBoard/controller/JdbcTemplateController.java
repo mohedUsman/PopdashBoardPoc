@@ -5,6 +5,9 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import hitachi_genai.popDashBoard.DTO.CostRequest;
 import hitachi_genai.popDashBoard.DTO.CostResponse;
+
+import hitachi_genai.popDashBoard.dto.CostResponse1;
+import hitachi_genai.popDashBoard.dto.CostResponse2;
 import hitachi_genai.popDashBoard.dao.ServiceCategoryCostDAO;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryBreakdownCostResponse;
 import hitachi_genai.popDashBoard.jdbcTemplateDTO.ServiceCategoryCostRequests;
@@ -62,13 +65,13 @@ public class JdbcTemplateController {
     }
 
     @PostMapping("/service-category-costs")
-    public List<ServiceCategoryCostResponse> getServiceCategoryCosts(@RequestBody ServiceCategoryCostRequests request) {
+    public List<CostResponse2> getServiceCategoryCosts(@RequestBody ServiceCategoryCostRequests request) {
         return service.getServiceCategoryCosts(request);
 
     }
 
     @PostMapping("/service-category-breakdown-costs")
-    public List<ServiceCategoryBreakdownCostResponse> getServiceCategoryBreakdownCosts(@RequestBody ServiceCategoryCostRequests request) {
+    public List<CostResponse1> getServiceCategoryBreakdownCosts(@RequestBody ServiceCategoryCostRequests request) {
         return service.getServiceCategoryBreakdownCosts(request);
     }
 

@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/v1/costs")
+//@RestController
+//@RequestMapping("/api/v1/costs")
 public class FocusExportAggregationController {
 
     @Autowired
@@ -82,26 +82,26 @@ public class FocusExportAggregationController {
     }
 
   **/
-    @PostMapping("/getAPI_2_ServiceCategory_Cost")
-    public ResponseEntity<List<ServiceCategoryCost>> getTotalAPI_2_ServiceCategory_Cost(
-            @RequestBody ServiceCategoryCostRequest request) {
-        List<Object[]> results = focusExportService.getAPI_2_ServiceCategory_Cost(request);
-        List<ServiceCategoryCost> response = results.stream().map(result ->{
-            ServiceCategoryCost cost = new ServiceCategoryCost();
-            cost.setPeriod((Date) result[0]);
-            cost.setServiceCategory(result[1].toString());
-            cost.setTotalCost((BigDecimal) result[2]);
-            cost.setProviderName((String) result[3]);
-            cost.setBillingCurrency(String.valueOf((BillingCurrency) result[4]));
-            cost.setSubAccountId((String) result[5]);
-            cost.setSubAccountName(String.valueOf((SubAccountName) result[6]));
-            cost.setOverallTotalCost((BigDecimal) result[7]);
-            return cost;
-        }).collect(Collectors.toList());
-
-
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping("/getAPI_2_ServiceCategory_Cost")
+//    public ResponseEntity<List<ServiceCategoryCost>> getTotalAPI_2_ServiceCategory_Cost(
+//            @RequestBody ServiceCategoryCostRequest request) {
+//        List<Object[]> results = focusExportService.getAPI_2_ServiceCategory_Cost(request);
+//        List<ServiceCategoryCost> response = results.stream().map(result ->{
+//            ServiceCategoryCost cost = new ServiceCategoryCost();
+//            cost.setPeriod((Date) result[0]);
+//            cost.setServiceCategory(result[1].toString());
+//            cost.setTotalCost((BigDecimal) result[2]);
+//            cost.setProviderName((String) result[3]);
+//            cost.setBillingCurrency(String.valueOf((BillingCurrency) result[4]));
+//            cost.setSubAccountId((String) result[5]);
+//            cost.setSubAccountName(String.valueOf((SubAccountName) result[6]));
+//            cost.setOverallTotalCost((BigDecimal) result[7]);
+//            return cost;
+//        }).collect(Collectors.toList());
+//
+//
+//        return ResponseEntity.ok(response);
+//    }
 
  //   getfindAPI_3_ServiceCategory_BreakDown_Cost
     @PostMapping("/getAPI_3_ServiceCategory_BreakDown_Cost")
