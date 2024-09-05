@@ -22,17 +22,20 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    private static final BigDecimal INR_TO_USD_EXCHANGE_RATE = new BigDecimal(0.012); // Example rate
+
+
     @Override
     public List<CostResponse2> getServiceCategoryCosts(ServiceCategoryCostRequests request) {
         String sql = "SELECT " +
-                "c.sub_account_id, " +
-                "c.sub_account_name, " +
+//                "c.sub_account_id, " +
+//                "c.sub_account_name, " +
                 "CASE " +
                 "WHEN ? = 'daily' THEN DATE_TRUNC('day', c.charge_period_start) " +
                 "WHEN ? = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start) " +
                 "END AS period, " +
                 "c.service_category, " +
-                "c.billing_currency, " +
+//                "c.billing_currency, " +
                 "SUM(c.billed_cost) AS total_cost " +
                 "FROM resource_usage_metrics_data c " +
                 "WHERE c.charge_period_start >= ? " +
@@ -40,8 +43,8 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 "AND (? IS NULL OR c.billing_currency = ?) " +
                 "AND (? IS NULL OR c.provider_name = ANY(?)) " +
                 "AND (? IS NULL OR c.sub_account_id = ANY(?)) " +
-                "GROUP BY (c.sub_account_id, c.sub_account_name, period, c.service_category, c.billing_currency) " +
-                "ORDER BY c.sub_account_id, c.sub_account_name, period, c.service_category";
+                "GROUP BY (  c.service_category,period) " +
+                "ORDER BY  total_cost desc ,c.service_category,period";
 
         List<ServiceCategoryCost1> serviceCategoryCostResponses = jdbcTemplate.query(sql,ps ->{
             ps.setString(1, request.getPeriodicity());
@@ -58,10 +61,16 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
             Array subAccountIdsArray = jdbcTemplate.getDataSource().getConnection().createArrayOf("text", request.getSubAccountId().toArray());
             ps.setArray(9, subAccountIdsArray);
             ps.setArray(10, subAccountIdsArray);
-        },(rs,rowNum) -> new ServiceCategoryCost1(
+        },(rs,rowNum) ->
+        {
+            BigDecimal totalCostInINR = rs.getBigDecimal("total_cost");
+            BigDecimal totalCostInUSD = totalCostInINR.multiply(INR_TO_USD_EXCHANGE_RATE);
+        return new ServiceCategoryCost1(
                 rs.getString("service_category"),
-                rs.getBigDecimal("total_cost")
-        ));
+                totalCostInUSD
+        );
+
+        });
 
         CostResponse2 response2 = new CostResponse2();
         response2.setMessage("Success");
@@ -87,7 +96,7 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 "WHEN ? = 'daily' THEN DATE_TRUNC('day', c.charge_period_start) " +
                 "WHEN ? = 'monthly' THEN DATE_TRUNC('month', c.charge_period_start) " +
                 "END AS period, " +
-                "c.billing_currency, " +
+//                "c.billing_currency, " +
                 "SUM(c.billed_cost) AS total_cost " +
                 "FROM resource_usage_metrics_data c " +
                 "WHERE c.charge_period_start >= ? " +
@@ -96,9 +105,9 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 "AND (? IS NULL OR c.provider_name = ANY(?)) " +
                 "AND (? IS NULL OR c.sub_account_id = ANY(?)) " +
                 "GROUP BY (c.service_category ,c.service_name," +
-                "c.charge_description, period, c.billing_currency) " +
+                "c.charge_description, period) " +
                 "ORDER BY SUM(c.billed_cost) DESC , c.service_category,c.service_name" +
-                ",c.charge_description ";
+                ",c.charge_description,period ";
 
 
       Map<String, ServiceCategoryCost> serviceCategoryCostMap = new HashMap<>();
@@ -154,8 +163,10 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
           String serviceName = rs.getString("service_name");
           String subServiceName = rs.getString("charge_description");
           Date period = rs.getDate("period");
-          String billing_currency = rs.getString("billing_currency");
+         // String billing_currency = rs.getString("billing_currency");
           BigDecimal total_cost = rs.getBigDecimal("total_cost");
+
+        BigDecimal totalCostInUSD = total_cost.multiply(INR_TO_USD_EXCHANGE_RATE);
 
               ServiceCategoryCost serviceCategoryCost = serviceCategoryCostMap.computeIfAbsent(serviceCategory, k -> {
               ServiceCategoryCost cost = new ServiceCategoryCost();
@@ -197,12 +208,12 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                         return ssn;
                     });
 
-             subServiceNameObj.setChargeDescriptionCost(subServiceNameObj.getChargeDescriptionCost().add(total_cost));
+             subServiceNameObj.setChargeDescriptionCost(subServiceNameObj.getChargeDescriptionCost().add(totalCostInUSD));
 
 
              IncurredCost incurredCost = new IncurredCost();
              incurredCost.setDate(period);
-             incurredCost.setIncurredCost(total_cost);
+             incurredCost.setIncurredCost(totalCostInUSD);
              subServiceNameObj.getIncurredCosts().add(incurredCost);
       }
 
@@ -247,6 +258,9 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
             });
 
             Data data = costResponse.getData();
+            BigDecimal incurredCostInINR = rs.getBigDecimal("incurredCost");
+            BigDecimal incurredCostInUSD = incurredCostInINR.multiply(INR_TO_USD_EXCHANGE_RATE);
+
 
             if ("monthly".equalsIgnoreCase(periodicity)) {
                 MonthlyIncurredCost incurredCost = new MonthlyIncurredCost();
@@ -260,7 +274,7 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 data.getDailyIncurredCost().add(incurredCost);
             }
 
-            data.setTotalIncurredCost(data.getTotalIncurredCost() + rs.getDouble("incurredCost"));
+            data.setTotalIncurredCost(data.getTotalIncurredCost() + incurredCostInUSD.doubleValue());
         });
 
         return new ArrayList<>(costResponseMap.values());
