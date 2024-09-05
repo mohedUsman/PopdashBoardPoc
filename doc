@@ -96,6 +96,23 @@ SELECT  c.sub_account_id,
                 ORDER BY c.sub_account_id, c.sub_account_name, period, c.service_category,
 				c.billing_currency, c.region_name, c.resource_type, c.charge_description;
 
+
+
+
+{
+           "periodicity": "monthly",
+
+           "chargePeriodStart": "2024-07-01T11:57:49.237Z",
+           "chargePeriodEnd": "2024-08-01T11:57:49.237Z",
+           "billingCurrency": "INR",
+           "providerName": [
+             "Microsoft"
+           ],
+           "subAccountId": [
+             "/subscriptions/0f8c3763-9eeb-40f9-9037-2a5426da75e9"
+           ]
+         }
+
 *****************************************************************************************************
 
 Postgress for API 2 ServiceCategory Cost

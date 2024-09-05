@@ -23,7 +23,7 @@ public class ServiceCategoryCost {
 //          "c.ServiceCategory, SUM(c.billedCost) AS TotalCost ,c.ProviderName , c.BillingCurrency ,c.SubAccountId , c.SubAccountName "
 
     private String serviceCategory;
-    private BigDecimal serviceCategoryTotalCost;
+    //private BigDecimal serviceCategoryTotalCost;
     private List<ServicesName> serviceNames;
 //    private String billingCurrency;
 //    private String providerName;
@@ -33,5 +33,10 @@ public class ServiceCategoryCost {
 //    private BigDecimal overallTotalCost;
 //    private Date ChargePeriodStart;
 //    private Date ChargePeriodEnd;
+   // private BigDecimal totalCost = BigDecimal.ZERO;
+
+//    public void addTotalCost(BigDecimal cost){
+//        this.totalCost = this.totalCost.add(cost);
+//    }
 
 }

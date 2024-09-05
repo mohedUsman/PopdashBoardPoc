@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/v1/costs")
+//@RestController
+//@RequestMapping("/api/v1/costs")
 public class FocusExportAggregationController {
 
     @Autowired

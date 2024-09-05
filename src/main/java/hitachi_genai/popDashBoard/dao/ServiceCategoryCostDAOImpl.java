@@ -23,7 +23,7 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public List<ServiceCategoryCostResponse> getServiceCategoryCosts(ServiceCategoryCostRequests request) {
+    public List<CostResponse2> getServiceCategoryCosts(ServiceCategoryCostRequests request) {
         String sql = "SELECT " +
                 "c.sub_account_id, " +
                 "c.sub_account_name, " +
@@ -40,10 +40,10 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 "AND (? IS NULL OR c.billing_currency = ?) " +
                 "AND (? IS NULL OR c.provider_name = ANY(?)) " +
                 "AND (? IS NULL OR c.sub_account_id = ANY(?)) " +
-                "GROUP BY rollup(c.sub_account_id, c.sub_account_name, period, c.service_category, c.billing_currency) " +
+                "GROUP BY (c.sub_account_id, c.sub_account_name, period, c.service_category, c.billing_currency) " +
                 "ORDER BY c.sub_account_id, c.sub_account_name, period, c.service_category";
 
-        return jdbcTemplate.query(sql, ps -> {
+        List<ServiceCategoryCost1> serviceCategoryCostResponses = jdbcTemplate.query(sql,ps ->{
             ps.setString(1, request.getPeriodicity());
             ps.setString(2, request.getPeriodicity());
             ps.setDate(3, new java.sql.Date(request.getChargePeriodStart().getTime()));
@@ -58,8 +58,23 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
             Array subAccountIdsArray = jdbcTemplate.getDataSource().getConnection().createArrayOf("text", request.getSubAccountId().toArray());
             ps.setArray(9, subAccountIdsArray);
             ps.setArray(10, subAccountIdsArray);
-        }, this::mapRowToServiceCategoryCostResponse);
-    }
+        },(rs,rowNum) -> new ServiceCategoryCost1(
+                rs.getString("service_category"),
+                rs.getBigDecimal("total_cost")
+        ));
+
+        CostResponse2 response2 = new CostResponse2();
+        response2.setMessage("Success");
+        response2.setErrors(new ArrayList<>());
+
+        Data2 data2 = new Data2();
+        data2.setServiceCategories(serviceCategoryCostResponses);
+        response2.setData(data2);
+
+        return Collections.singletonList(response2);
+        }
+
+
 
     @Override
     public List<CostResponse1> getServiceCategoryBreakdownCosts(ServiceCategoryCostRequests request) {
@@ -80,28 +95,38 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                 "AND (? IS NULL OR c.billing_currency = ?) " +
                 "AND (? IS NULL OR c.provider_name = ANY(?)) " +
                 "AND (? IS NULL OR c.sub_account_id = ANY(?)) " +
-                "GROUP BY rollup(c.service_category ,c.service_name," +
+                "GROUP BY (c.service_category ,c.service_name," +
                 "c.charge_description, period, c.billing_currency) " +
-                "ORDER BY total_cost desc , c.service_category,c.service_name" +
+                "ORDER BY SUM(c.billed_cost) DESC , c.service_category,c.service_name" +
                 ",c.charge_description ";
 
 
       Map<String, ServiceCategoryCost> serviceCategoryCostMap = new HashMap<>();
 
-      jdbcTemplate.query(sql,ps -> {
-                  setPreparedStatementParameters(ps, request);
-              },rs ->{
-          processResultSet(rs, serviceCategoryCostMap);
-              });
+      CostResponse1 response = new CostResponse1();
+      response.setMessage("Success");
+        response.setErrors(new ArrayList<>());
 
+        try {
+            jdbcTemplate.query(sql, ps -> {
+                setPreparedStatementParameters(ps, request);
+            }, rs -> {
+                processResultSet(rs, serviceCategoryCostMap);
+            });
+        } catch (Exception e){
+            response.addError("500" ,"Internal Server Error"+e.getMessage());
+        }
+
+//        List<ServiceCategoryCost> serviceCategoryCosts = new ArrayList<>(serviceCategoryCostMap.values());
+//        serviceCategoryCosts.sort((a,b) -> b.getTotalCost().compareTo(a.getTotalCost()));
 
       Data1 data = new Data1();
         data.setServiceCategories(new ArrayList<>(serviceCategoryCostMap.values()));
 
-        CostResponse1 response = new CostResponse1();
-        response.setMessage("Success");
+//        CostResponse1 response = new CostResponse1();
+//        response.setMessage("Success");
         response.setData(data);
-        response.setErrors(new ArrayList<>());
+       // response.setErrors(new ArrayList<>());
 
         return Collections.singletonList(response);
     }
@@ -135,12 +160,12 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
               ServiceCategoryCost serviceCategoryCost = serviceCategoryCostMap.computeIfAbsent(serviceCategory, k -> {
               ServiceCategoryCost cost = new ServiceCategoryCost();
               cost.setServiceCategory(serviceCategory);
-              cost.setServiceCategoryTotalCost(BigDecimal.ZERO);
+             // cost.setServiceCategoryTotalCost(BigDecimal.ZERO);
               cost.setServiceNames(new ArrayList<>());
               return cost;
           });
 
-              serviceCategoryCost.setServiceCategoryTotalCost(serviceCategoryCost.getServiceCategoryTotalCost().add(total_cost) );
+             // serviceCategoryCost.setServiceCategoryTotalCost(serviceCategoryCost.getServiceCategoryTotalCost().add(total_cost) );
 
 
               ServicesName servicesNameObj = serviceCategoryCost.getServiceNames().stream()
@@ -149,30 +174,30 @@ public class ServiceCategoryCostDAOImpl implements ServiceCategoryCostDAO {
                   .orElseGet(() -> {
                       ServicesName sn = new ServicesName();
                       sn.setServiceName(serviceName);
-                      sn.setServiceCost(BigDecimal.ZERO);
-                      sn.setSubServiceCount(0);
+                     // sn.setServiceCost(BigDecimal.ZERO);
+                    //  sn.setSubServiceCount(0);
                       sn.setSubServiceNames(new ArrayList<>());
                       serviceCategoryCost.getServiceNames().add(sn);
                       return sn;
                   });
 
 
-              servicesNameObj.setServiceCost(servicesNameObj.getServiceCost().add(total_cost));
-              servicesNameObj.setSubServiceCount(servicesNameObj.getSubServiceCount()+1);
+             // servicesNameObj.setServiceCost(servicesNameObj.getServiceCost().add(total_cost));
+              //servicesNameObj.setSubServiceCount(servicesNameObj.getSubServiceCount()+1);
 
              SubServiceName subServiceNameObj = servicesNameObj.getSubServiceNames().stream()
-                    .filter(ssn -> subServiceName != null &&  subServiceName.equals(ssn.getSubServiceName()))
+                    .filter(ssn -> subServiceName != null &&  subServiceName.equals(ssn.getChargeDescriptionName()))
                     .findFirst()
                     .orElseGet(() -> {
                         SubServiceName ssn = new SubServiceName();
-                        ssn.setSubServiceName(subServiceName);
-                        ssn.setSubServiceCost(BigDecimal.ZERO);
+                        ssn.setChargeDescriptionName(subServiceName);
+                        ssn.setChargeDescriptionCost(BigDecimal.ZERO);
                         ssn.setIncurredCosts(new ArrayList<>());
                         servicesNameObj.getSubServiceNames().add(ssn);
                         return ssn;
                     });
 
-             subServiceNameObj.setSubServiceCost(subServiceNameObj.getSubServiceCost().add(total_cost));
+             subServiceNameObj.setChargeDescriptionCost(subServiceNameObj.getChargeDescriptionCost().add(total_cost));
 
 
              IncurredCost incurredCost = new IncurredCost();

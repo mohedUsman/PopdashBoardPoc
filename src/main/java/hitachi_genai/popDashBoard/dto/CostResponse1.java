@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,6 +20,17 @@ public class CostResponse1 {
          private String message;
         private Data1 data;
         private List<Error> errors;
+
+        public void addError(String code , String message){
+            if(this.errors == null){
+                this.errors = new ArrayList<>();
+            }
+            Error error = new Error();
+            error.setCode(code);
+            error.setMessage(message);
+            this.errors.add(error);
+        }
+
     }
 
 

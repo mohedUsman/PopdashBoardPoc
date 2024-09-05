@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SubServiceName {
 
-    private String subServiceName;
-    private BigDecimal subServiceCost;
+    private String chargeDescriptionName;
+    private BigDecimal chargeDescriptionCost;
     private List<IncurredCost> incurredCosts;
 }
